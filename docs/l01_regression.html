@@ -220,7 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="74f1415b" class="cell" data-execution_count="1">
+<div id="411bd31b" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setup: libraries and plotting theme</span></span>
@@ -243,7 +243,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 data-number="2"><span class="header-section-number">2</span> Diagnostics for the simple linear regression: residual analysis</h1>
 <section id="homoskedasticity" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="homoskedasticity"><span class="header-section-number">2.1</span> Homoskedasticity</h2>
-<div id="0d25fd8c" class="cell" data-execution_count="2">
+<div id="6694af81" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated "ideal" residuals</span></span>
@@ -267,7 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="example-dishwasher-shipments-model-and-patterns-in-residuals" class="level3" data-number="2.1.1">
 <h3 data-number="2.1.1" class="anchored" data-anchor-id="example-dishwasher-shipments-model-and-patterns-in-residuals"><span class="header-section-number">2.1.1</span> Example: Dishwasher shipments model and patterns in residuals</h3>
-<div id="ef03d75f" class="cell" data-execution_count="3">
+<div id="bf592b6d" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load dishwasher data (tab-delimited) and fit SLR DISH ~ RES</span></span>
@@ -314,7 +314,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="2.2" class="anchored" data-anchor-id="uncorrelatedness"><span class="header-section-number">2.2</span> Uncorrelatedness</h2>
 <section id="durbinwatson-test" class="level3" data-number="2.2.1">
 <h3 data-number="2.2.1" class="anchored" data-anchor-id="durbinwatson-test"><span class="header-section-number">2.2.1</span> Durbin–Watson test</h3>
-<div id="45b1cfb6" class="cell" data-execution_count="4">
+<div id="1b5c2a24" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dw <span class="op">=</span> durbin_watson(resid1)</span>
@@ -327,7 +327,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="runs-test" class="level3" data-number="2.2.2">
 <h3 data-number="2.2.2" class="anchored" data-anchor-id="runs-test"><span class="header-section-number">2.2.2</span> Runs test</h3>
-<div id="f9333c74" class="cell" data-execution_count="5">
+<div id="764071af" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H0: sequence is random (no persistence). Use zero median by default.</span></span>
@@ -343,7 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="normality" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="normality"><span class="header-section-number">2.3</span> Normality</h2>
-<div id="4f97e406" class="cell" data-execution_count="6">
+<div id="c2150ad8" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Histograms of simulated normal data and residuals</span></span>
@@ -365,7 +365,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="263bc80b" class="cell" data-execution_count="7">
+<div id="2555fbe6" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Q-Q plots</span></span>
@@ -385,7 +385,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="87de1ce4" class="cell" data-execution_count="8">
+<div id="187e9e77" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shapiro–Wilk tests</span></span>
@@ -400,7 +400,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="multiple-linear-regression-mlr" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="multiple-linear-regression-mlr"><span class="header-section-number">2.4</span> Multiple linear regression (MLR)</h2>
-<div id="e7702fc2" class="cell" data-execution_count="9">
+<div id="a46487ee" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extend to DISH ~ RES + DUR</span></span>
@@ -434,7 +434,7 @@ Dep. Variable:                   DISH   R-squared:                       0.877
 Model:                            OLS   Adj. R-squared:                  0.867
 Method:                 Least Squares   F-statistic:                     82.26
 Date:                Fri, 24 Oct 2025   Prob (F-statistic):           3.31e-11
-Time:                        16:23:00   Log-Likelihood:                -189.63
+Time:                        16:26:40   Log-Likelihood:                -189.63
 No. Observations:                  26   AIC:                             385.3
 Df Residuals:                      23   BIC:                             389.0
 Df Model:                           2                                         
@@ -468,7 +468,7 @@ Notes:
 {'shapiro_mod2': ShapiroResult(statistic=np.float64(0.9791592436260312), pvalue=np.float64(0.8556001909507365))}</code></pre>
 </div>
 </div>
-<div id="ee897bb3" class="cell" data-execution_count="10">
+<div id="b5397916" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example prediction with intervals (statsmodels: get_prediction + summary_frame)</span></span>
