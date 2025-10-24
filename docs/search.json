@@ -1,0 +1,92 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Time Series Analysis in Python",
+    "section": "",
+    "text": "Preface\nThis is a collection of lecture notes on applied time series analysis and forecasting using the programming language Python. Many of these lectures are based on the original notes by Y. R. Gel and C. Cutler for the course STAT-443 Forecasting (University of Waterloo, Canada) adapted and expanded by V. Lyubchich for the course MEES-713 Environmental Statistics 2 (University of Maryland, USA).\nEach lecture starts by listing the learning objectives and required reading materials, with additional references in the text. The notes introduce the methods and give a few examples but are less detailed than the reading materials. The notes do not substitute a textbook.\nThe audience is expected to be familiar with Python programming and the following statistical concepts and methods: probability distributions, sampling inference and hypothesis testing, correlation analysis, and regression analysis (including simple and multiple linear regression, mixed-effects models, generalized linear models, and generalized additive models).",
+    "crumbs": [
+      "Preface"
+    ]
+  },
+  {
+    "objectID": "index.html#authors",
+    "href": "index.html#authors",
+    "title": "Time Series Analysis in Python",
+    "section": "Authors",
+    "text": "Authors\nThis book, Time Series Analysis in Python, is an adaptation by Vyacheslav Lyubchich.\nIt is based on the original work, Time Series Analysis: Lecture Notes with Examples in R, by V. Lyubchich and Y. R. Gel, available at https://vlyubchich.github.io/tsar/ and licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.\nThis new, adapted work is also licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.",
+    "crumbs": [
+      "Preface"
+    ]
+  },
+  {
+    "objectID": "index.html#citation",
+    "href": "index.html#citation",
+    "title": "Time Series Analysis in Python",
+    "section": "Citation",
+    "text": "Citation\nLyubchich, V. (2025) Time Series Analysis in Python. Edition 2025-10. https://vlyubchich.github.io/tsapy/",
+    "crumbs": [
+      "Preface"
+    ]
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "Time Series Analysis in Python",
+    "section": "License",
+    "text": "License\nThis work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.",
+    "crumbs": [
+      "Preface"
+    ]
+  },
+  {
+    "objectID": "l01_regression.html",
+    "href": "l01_regression.html",
+    "title": "1  Review of Linear Regression (Python)",
+    "section": "",
+    "text": "2 Diagnostics for the simple linear regression: residual analysis",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Review of Linear Regression (Python)</span>"
+    ]
+  },
+  {
+    "objectID": "l01_regression.html#homoskedasticity",
+    "href": "l01_regression.html#homoskedasticity",
+    "title": "1  Review of Linear Regression (Python)",
+    "section": "2.1 Homoskedasticity",
+    "text": "2.1 Homoskedasticity\n\n\nCode\n# Simulated \"ideal\" residuals\nn, m, s = 26, 0.0, 522.0\nx = np.random.normal(loc=m, scale=s, size=n)\nfig, ax = plt.subplots(figsize=(8, 3))\nax.plot(x, lw=1)\nax.axhline(0, ls=\"--\", c=\"tab:blue\")\nax.set_title(\"A time series plot of 'ideal' residuals (i.i.d. normal)\")\nax.set_xlabel(\"t\")\nax.set_ylabel(\"Residuals\")\nplt.show()\n\n\n\n\n\n\n\n\n\n\n2.1.1 Example: Dishwasher shipments model and patterns in residuals\n\n\nCode\n# Load dishwasher data (tab-delimited) and fit SLR DISH ~ RES\nD = pd.read_csv(\"data/dish.txt\", sep=\"\\t\")\nif \"YEAR\" in D.columns:\n    D = D.rename(columns={\"YEAR\": \"Year\"})\n\nmod1 = smf.ols(\"DISH ~ RES\", data=D).fit()\nresid1 = mod1.resid\nfitted1 = mod1.fittedvalues\n\nfig, axes = plt.subplots(1, 3, figsize=(12, 3))\n# Residuals vs time\naxes[0].plot(D[\"Year\"], resid1)\naxes[0].axhline(0, ls=\"--\", c=\"tab:blue\")\naxes[0].set_ylabel(\"Residuals\")\naxes[0].set_title(\"Residuals vs time\")\n# Residuals vs fitted\naxes[1].scatter(fitted1, resid1, s=20)\naxes[1].axhline(0, ls=\"--\", c=\"tab:blue\")\naxes[1].set_xlabel(\"Fitted values\")\naxes[1].set_ylabel(\"Residuals\")\naxes[1].set_title(\"Residuals vs fitted\")\n# Residuals vs predictor\naxes[2].scatter(D[\"RES\"], resid1, s=20)\naxes[2].axhline(0, ls=\"--\", c=\"tab:blue\")\naxes[2].set_xlabel(\"Residential investments (RES)\")\naxes[2].set_ylabel(\"Residuals\")\naxes[2].set_title(\"Residuals vs RES\")\nplt.tight_layout()\nplt.show()",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Review of Linear Regression (Python)</span>"
+    ]
+  },
+  {
+    "objectID": "l01_regression.html#uncorrelatedness",
+    "href": "l01_regression.html#uncorrelatedness",
+    "title": "1  Review of Linear Regression (Python)",
+    "section": "2.2 Uncorrelatedness",
+    "text": "2.2 Uncorrelatedness\n\n2.2.1 Durbin–Watson test\n\n\nCode\ndw = durbin_watson(resid1)\nprint({\"Durbin-Watson\": dw})\n\n\n{'Durbin-Watson': np.float64(0.5713900110592645)}\n\n\n\n\n2.2.2 Runs test\n\n\nCode\n# H0: sequence is random (no persistence). Use zero median by default.\n# The function returns (z-statistic, p-value).\nzstat, pval = runstest_1samp(resid1, correction=False)\nprint({\"runs_z\": float(zstat), \"runs_pvalue\": float(pval)})\n\n\n{'runs_z': -2.746790210287299, 'runs_pvalue': 0.006018161619613106}",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Review of Linear Regression (Python)</span>"
+    ]
+  },
+  {
+    "objectID": "l01_regression.html#normality",
+    "href": "l01_regression.html#normality",
+    "title": "1  Review of Linear Regression (Python)",
+    "section": "2.3 Normality",
+    "text": "2.3 Normality\n\n\nCode\n# Histograms of simulated normal data and residuals\nfig, axes = plt.subplots(1, 2, figsize=(10, 4))\naxes[0].hist(x, bins=10, density=True, color=\"0.6\")\naxes[0].set_title(\"Random normal values\")\naxes[0].set_ylabel(\"Density\")\naxes[1].hist(resid1, bins=10, density=True, color=\"0.6\")\naxes[1].set_title(\"Model residuals\")\naxes[1].set_ylabel(\"Density\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\nCode\n# Q-Q plots\nfig, axes = plt.subplots(1, 2, figsize=(10, 4))\nsm.ProbPlot(x).qqplot(line=\"45\", ax=axes[0])\naxes[0].set_title(\"Random normal values\")\nsm.ProbPlot(resid1).qqplot(line=\"45\", ax=axes[1])\naxes[1].set_title(\"Model residuals\")\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\nCode\n# Shapiro–Wilk tests\nprint({\"shapiro_x\": shapiro(x)})\nprint({\"shapiro_resid\": shapiro(resid1)})\n\n\n{'shapiro_x': ShapiroResult(statistic=np.float64(0.9675467536617025), pvalue=np.float64(0.5608570158716737))}\n{'shapiro_resid': ShapiroResult(statistic=np.float64(0.9749991015844385), pvalue=np.float64(0.7542051882335223))}",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Review of Linear Regression (Python)</span>"
+    ]
+  },
+  {
+    "objectID": "l01_regression.html#multiple-linear-regression-mlr",
+    "href": "l01_regression.html#multiple-linear-regression-mlr",
+    "title": "1  Review of Linear Regression (Python)",
+    "section": "2.4 Multiple linear regression (MLR)",
+    "text": "2.4 Multiple linear regression (MLR)\n\n\nCode\n# Extend to DISH ~ RES + DUR\nmod2 = smf.ols(\"DISH ~ RES + DUR\", data=D).fit()\nprint(mod2.summary())\n\nresid2 = mod2.resid\nfitted2 = mod2.fittedvalues\n\nfig, axes = plt.subplots(1, 2, figsize=(10, 4))\naxes[0].plot(D[\"Year\"], resid2)\naxes[0].axhline(0, ls=\"--\", c=\"tab:blue\")\naxes[0].set_ylabel(\"Residuals\")\naxes[0].set_title(\"Residuals vs time\")\naxes[1].scatter(fitted2, resid2, s=20)\naxes[1].axhline(0, ls=\"--\", c=\"tab:blue\")\naxes[1].set_xlabel(\"Fitted values\")\naxes[1].set_ylabel(\"Residuals\")\naxes[1].set_title(\"Residuals vs fitted\")\nplt.tight_layout()\nplt.show()\n\nprint({\"DW_mod2\": durbin_watson(resid2)})\nprint({\"runs_mod2\": runstest_1samp(resid2, correction=False)})\nprint({\"shapiro_mod2\": shapiro(resid2)})\n\n\n                            OLS Regression Results                            \n==============================================================================\nDep. Variable:                   DISH   R-squared:                       0.877\nModel:                            OLS   Adj. R-squared:                  0.867\nMethod:                 Least Squares   F-statistic:                     82.26\nDate:                Fri, 24 Oct 2025   Prob (F-statistic):           3.31e-11\nTime:                        16:23:00   Log-Likelihood:                -189.63\nNo. Observations:                  26   AIC:                             385.3\nDf Residuals:                      23   BIC:                             389.0\nDf Model:                           2                                         \nCovariance Type:            nonrobust                                         \n==============================================================================\n                 coef    std err          t      P&gt;|t|      [0.025      0.975]\n------------------------------------------------------------------------------\nIntercept  -1603.0915    391.308     -4.097      0.000   -2412.573    -793.610\nRES           50.9683     11.373      4.482      0.000      27.442      74.495\nDUR           13.7705      2.780      4.954      0.000       8.020      19.521\n==============================================================================\nOmnibus:                        1.852   Durbin-Watson:                   0.413\nProb(Omnibus):                  0.396   Jarque-Bera (JB):                1.075\nSkew:                           0.496   Prob(JB):                        0.584\nKurtosis:                       3.084   Cond. No.                         661.\n==============================================================================\n\nNotes:\n[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n\n\n\n\n\n\n\n\n\n{'DW_mod2': np.float64(0.4128009203586526)}\n{'runs_mod2': (np.float64(-2.788637247089075), np.float64(0.005293031474682683))}\n{'shapiro_mod2': ShapiroResult(statistic=np.float64(0.9791592436260312), pvalue=np.float64(0.8556001909507365))}\n\n\n\n\nCode\n# Example prediction with intervals (statsmodels: get_prediction + summary_frame)\nnew_data = pd.DataFrame({\"RES\": [100.0], \"DUR\": [150.0]})\npred = mod2.get_prediction(new_data)\nprint(pred.summary_frame(alpha=0.05))\n\n\n         mean     mean_se  mean_ci_lower  mean_ci_upper  obs_ci_lower  \\\n0  5559.30799  521.113009    4481.303598    6637.312381   4227.130196   \n\n   obs_ci_upper  \n0   6891.485783",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Review of Linear Regression (Python)</span>"
+    ]
+  }
+]

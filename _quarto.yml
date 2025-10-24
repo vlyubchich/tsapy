@@ -3,14 +3,13 @@ project:
     output-dir: docs
 
 book:
-    title: Time Series Analysis
-    subtitle: Lecture Notes with Examples in Python
+    title: Time Series Analysis in Python
     author: V. Lyubchich
     # date: today
     date-format: iso
   #  favicon: tsar_fav.png
   #  cover-image: tsar_cov.png
-  #  repo-url: https://github.com/vlyubchich/tsar/
+    repo-url: https://github.com/vlyubchich/tsapy/
     repo-branch: master
     repo-actions: [edit, issue]
   # downloads: [pdf, epub]
