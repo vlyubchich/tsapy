@@ -1,0 +1,156 @@
+---
+title: "Review of Linear Regression (Python)"
+---
+
+```{python}
+# Setup: libraries and plotting theme
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from statsmodels.stats.stattools import durbin_watson
+from statsmodels.sandbox.stats.runs import runstest_1samp
+from scipy.stats import shapiro
+
+sns.set_theme(style="whitegrid")
+np.set_printoptions(precision=3)
+np.random.seed(1)
+```
+
+# Diagnostics for the simple linear regression: residual analysis
+
+## Homoskedasticity
+
+```{python}
+# Simulated "ideal" residuals
+n, m, s = 26, 0.0, 522.0
+x = np.random.normal(loc=m, scale=s, size=n)
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.plot(x, lw=1)
+ax.axhline(0, ls="--", c="tab:blue")
+ax.set_title("A time series plot of 'ideal' residuals (i.i.d. normal)")
+ax.set_xlabel("t")
+ax.set_ylabel("Residuals")
+plt.show()
+```
+
+### Example: Dishwasher shipments model and patterns in residuals
+
+```{python}
+# Load dishwasher data (tab-delimited) and fit SLR DISH ~ RES
+D = pd.read_csv("data/dish.txt", sep="\t")
+if "YEAR" in D.columns:
+    D = D.rename(columns={"YEAR": "Year"})
+
+mod1 = smf.ols("DISH ~ RES", data=D).fit()
+resid1 = mod1.resid
+fitted1 = mod1.fittedvalues
+
+fig, axes = plt.subplots(1, 3, figsize=(12, 3))
+# Residuals vs time
+axes[0].plot(D["Year"], resid1)
+axes[0].axhline(0, ls="--", c="tab:blue")
+axes[0].set_ylabel("Residuals")
+axes[0].set_title("Residuals vs time")
+# Residuals vs fitted
+axes[1].scatter(fitted1, resid1, s=20)
+axes[1].axhline(0, ls="--", c="tab:blue")
+axes[1].set_xlabel("Fitted values")
+axes[1].set_ylabel("Residuals")
+axes[1].set_title("Residuals vs fitted")
+# Residuals vs predictor
+axes[2].scatter(D["RES"], resid1, s=20)
+axes[2].axhline(0, ls="--", c="tab:blue")
+axes[2].set_xlabel("Residential investments (RES)")
+axes[2].set_ylabel("Residuals")
+axes[2].set_title("Residuals vs RES")
+plt.tight_layout()
+plt.show()
+```
+
+## Uncorrelatedness
+
+### Durbin–Watson test
+
+```{python}
+dw = durbin_watson(resid1)
+print({"Durbin-Watson": dw})
+```
+
+### Runs test
+
+```{python}
+# H0: sequence is random (no persistence). Use zero median by default.
+# The function returns (z-statistic, p-value).
+zstat, pval = runstest_1samp(resid1, correction=False)
+print({"runs_z": float(zstat), "runs_pvalue": float(pval)})
+```
+
+## Normality
+
+```{python}
+# Histograms of simulated normal data and residuals
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].hist(x, bins=10, density=True, color="0.6")
+axes[0].set_title("Random normal values")
+axes[0].set_ylabel("Density")
+axes[1].hist(resid1, bins=10, density=True, color="0.6")
+axes[1].set_title("Model residuals")
+axes[1].set_ylabel("Density")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+# Q-Q plots
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+sm.ProbPlot(x).qqplot(line="45", ax=axes[0])
+axes[0].set_title("Random normal values")
+sm.ProbPlot(resid1).qqplot(line="45", ax=axes[1])
+axes[1].set_title("Model residuals")
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+# Shapiro–Wilk tests
+print({"shapiro_x": shapiro(x)})
+print({"shapiro_resid": shapiro(resid1)})
+```
+
+## Multiple linear regression (MLR)
+
+```{python}
+# Extend to DISH ~ RES + DUR
+mod2 = smf.ols("DISH ~ RES + DUR", data=D).fit()
+print(mod2.summary())
+
+resid2 = mod2.resid
+fitted2 = mod2.fittedvalues
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+axes[0].plot(D["Year"], resid2)
+axes[0].axhline(0, ls="--", c="tab:blue")
+axes[0].set_ylabel("Residuals")
+axes[0].set_title("Residuals vs time")
+axes[1].scatter(fitted2, resid2, s=20)
+axes[1].axhline(0, ls="--", c="tab:blue")
+axes[1].set_xlabel("Fitted values")
+axes[1].set_ylabel("Residuals")
+axes[1].set_title("Residuals vs fitted")
+plt.tight_layout()
+plt.show()
+
+print({"DW_mod2": durbin_watson(resid2)})
+print({"runs_mod2": runstest_1samp(resid2, correction=False)})
+print({"shapiro_mod2": shapiro(resid2)})
+```
+
+```{python}
+# Example prediction with intervals (statsmodels: get_prediction + summary_frame)
+new_data = pd.DataFrame({"RES": [100.0], "DUR": [150.0]})
+pred = mod2.get_prediction(new_data)
+print(pred.summary_frame(alpha=0.05))
+```

@@ -1,0 +1,57 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# Quarto output directories
+docs/
+docs-py/
+_site/
+.quarto/
+
+# Quarto freeze cache
+/_freeze/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# R files (if any temporary R artifacts exist)
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.cache
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
