@@ -1,5 +1,21 @@
+# Review of Linear Regression {#sec-regression}
+
+After this lecture, you should be competent (again) in assessing violations of various assumptions of linear regression models, particularly assumptions about model residuals, by being able to apply visual assessments and formal statistical tests, and interpret the results and effects of the violations.
+
+**Objectives**
+
+1. Recall the form and standard assumptions of linear regression models.
+1. Recall and apply standard methods of assessing and testing homogeneity of variance and normality of residuals.
+1. Define and test independence (most often, uncorrelatedness) of regression model residuals.
+
+**Reading materials**
+
+* Chapters 3--4 in @Chatterjee:Hadi:2006
+
+[**Audio overview**](https://youtu.be/egZwXSAXULo)
+
 ```{python}
-#| echo: false
+#| echo: true
 
 import numpy as np
 import pandas as pd
@@ -16,22 +32,6 @@ sns.set_theme(style = "whitegrid")
 np.set_printoptions(precision = 3)
 np.random.seed(1)
 ```
-
-# Review of Linear Regression {#sec-regression}
-
-After this lecture, you should be competent (again) in assessing violations of various assumptions of linear regression models, particularly assumptions about model residuals, by being able to apply visual assessments and formal statistical tests, and interpret the results and effects of the violations.
-
-**Objectives**
-
-1. Recall the form and standard assumptions of linear regression models.
-1. Recall and apply standard methods of assessing and testing homogeneity of variance and normality of residuals.
-1. Define and test independence (most often, uncorrelatedness) of regression model residuals.
-
-**Reading materials**
-
-* Chapters 3--4 in @Chatterjee:Hadi:2006
-
-[**Audio overview**](https://youtu.be/egZwXSAXULo)
 
 
 ## Diagnostics for the simple linear regression: residual analysis

@@ -1,5 +1,7 @@
+# Generalized least squares {#sec-gls}
+
 ```{python}
-#| echo: false
+#| echo: true
 
 import numpy as np
 import pandas as pd
@@ -13,8 +15,6 @@ from statsmodels.regression.linear_model import GLSAR
 sns.set_theme(style = "whitegrid")
 np.set_printoptions(precision = 3)
 ```
-
-# Generalized least squares {#sec-gls}
 
 Here we use time series data (ordered by $t$), thus, @eq-mod1 will be written with the time indices $t$ as
 $$

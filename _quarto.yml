@@ -35,9 +35,9 @@ book:
         #- l13_spectral.qmd
         #- software.qmd
         - references.qmd
-    #appendices:
-        #- s1_wls.qmd
-        #- s2_gls.qmd
+    appendices:
+        - s1_wls.qmd
+        - s2_gls.qmd
         #- s4_trendsync.qmd
         # - s6_extremes.qmd
         #- s7_garma.qmd
@@ -52,7 +52,7 @@ appendix-style: default
 format:
     html:
         code-fold: true
-        code-link: true
+        code-link: false
         theme: cosmo
         page-layout: full
         css: styles.css

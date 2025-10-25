@@ -1,5 +1,7 @@
+# Weighted least squares {#sec-wls}
+
 ```{python}
-#| echo: false
+#| echo: true
 
 import numpy as np
 import pandas as pd
@@ -13,8 +15,6 @@ sns.set_theme(style = "whitegrid")
 np.set_printoptions(precision = 3)
 np.random.seed(111)
 ```
-
-# Weighted least squares {#sec-wls}
 
 We can often hypothesize that the standard deviation of residuals in the model
 $$
