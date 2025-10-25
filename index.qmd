@@ -5,8 +5,6 @@ engine: jupyter
 ## Preface {.unnumbered}
 
 This is a collection of lecture notes on applied time series analysis and forecasting using the programming language Python. 
-Many of these lectures are based on the original notes by Y. R. Gel and C. Cutler for the course STAT-443 *Forecasting* (University of Waterloo, Canada) adapted and expanded by V. Lyubchich for the course MEES-713 *Environmental Statistics 2* (University of Maryland, USA).
-
 Each lecture starts by listing the learning objectives and required reading materials, with additional references in the text. 
 The notes introduce the methods and give a few examples but are less detailed than the reading materials. 
 The notes do not substitute a textbook.
