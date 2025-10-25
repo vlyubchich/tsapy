@@ -1,15 +1,17 @@
----
-output: html_document
-editor_options:
-    chunk_output_type: console
----
+```{python}
+#| echo: false
 
-```{r, echo=FALSE}
-library(dplyr)
-library(ggplot2)
-library(patchwork)
-options(digits = 3)
-theme_set(theme_light())
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from statsmodels.sandbox.stats.runs import runstest_1samp
+
+sns.set_theme(style = "whitegrid")
+np.set_printoptions(precision = 3)
+np.random.seed(111)
 ```
 
 # Weighted least squares {#sec-wls}
@@ -35,72 +37,104 @@ then $\mathrm{var}\left(\frac{\varepsilon_i}{x_i}\right)=k^2$, i.e., it is now *
 
 Consider a simulated example of a linear model $y=3-2x$ with noise, which is a function of $x$.
 
-```{r}
-set.seed(111)
+```{python}
 k = 0.5
 n = 100
-x <- rnorm(n, 0, 5)
-y <- 3 - 2 * x + rnorm(n, 0, k*x^2)
+x = np.random.normal(loc = 0.0, scale = 5.0, size = n)
+y = 3 - 2 * x + np.random.normal(loc = 0.0, scale = k * (x ** 2), size = n)
+
+df = pd.DataFrame({"x": x, "y": y})
 ```
 
 The coefficients estimated using ordinary least squares (OLS):
 
-```{r}
+```{python}
 #| code-fold: false
 
-fit_ols <- lm(y ~ x)
-summary(fit_ols)
+fit_ols = smf.ols("y ~ x", data = df).fit()
+print(fit_ols.summary())
 ```
 
-Based on @fig-wlsOLS, the OLS assumption of homoskedasticity is violated, because the observations deviate farther from the regression line at its ends (i.e., the variability of regression residuals is higher at the low and high values of the predictor).
+Based on @fig-wlsols, the OLS assumption of homoskedasticity is violated, because the observations deviate farther from the regression line at its ends (i.e., the variability of regression residuals is higher at the low and high values of the predictor).
 
-```{r}
-#| label: fig-wlsOLS
+```{python}
+#| label: fig-wlsols
 #| fig-cap: "Simulated data example with heteroskedasticity. The gray line represents the underlying model; the dashed line is obtained from the OLS fit."
 
-p1 <- ggplot(data.frame(x, y), aes(x = x, y = y)) + 
-    geom_abline(intercept = 3, slope = -2, col = "gray50", lwd = 1.5) +
-    geom_abline(intercept = fit_ols$coefficients[1], 
-                slope = fit_ols$coefficients[2], lty = 2) +
-    geom_point()
-p2 <- ggplot(data.frame(x, y), aes(x = x, y = rstandard(fit_ols))) +
-    geom_hline(yintercept = 0, col = "gray50") +
-    geom_point() +
-    xlab("x") +
-    ylab("Standardized residuals")
-p1 + p2 +
-    plot_annotation(tag_levels = 'A')
+fig, axes = plt.subplots(1, 2, figsize = (12, 4))
+
+# A: data with underlying and OLS lines
+axes[0].scatter(df["x"], df["y"], s = 20)
+# Underlying model line
+x_line = np.linspace(df["x"].min(), df["x"].max(), 200)
+axes[0].plot(x_line, 3 + (-2) * x_line, color = "gray", linewidth = 1.5)
+# OLS fitted line
+beta0, beta1 = fit_ols.params["Intercept"], fit_ols.params["x"]
+axes[0].plot(x_line, beta0 + beta1 * x_line, linestyle = "--", color = "tab:blue")
+axes[0].set_xlabel("x")
+axes[0].set_ylabel("y")
+axes[0].set_title("A")
+
+# B: standardized residuals vs x
+infl = fit_ols.get_influence()
+std_resid_ols = infl.resid_studentized_internal
+axes[1].axhline(0, color = "gray", linewidth = 1)
+axes[1].scatter(df["x"], std_resid_ols, s = 20)
+axes[1].set_xlabel("x")
+axes[1].set_ylabel("Standardized residuals")
+axes[1].set_title("B")
+
+plt.tight_layout()
+plt.show()
 ```
 
 To stabilize the variance 'manually,' transform the variables according to @eq-mod1W and refit the model:
 
-```{r}
+```{python}
 #| code-fold: false
 
-Y.t <- y/x
-X.t <- 1/x
-fit_wls <- lm(Y.t ~ X.t)
-summary(fit_wls)
+# Manual transform per eq. (y/x) = (beta0/x) + beta1 + (eps/x)
+mask = df["x"] != 0
+df_t = pd.DataFrame({
+    "Yt": df.loc[mask, "y"] / df.loc[mask, "x"],
+    "Xt": 1.0 / df.loc[mask, "x"],
+    "x": df.loc[mask, "x"],
+})
+fit_wls = smf.ols("Yt ~ Xt", data = df_t).fit()
+print(fit_wls.summary())
 ```
 
 Check @eq-mod1W to see the correspondence of the coefficients, see the results in @fig-wls.
 
-```{r}
+```{python}
 #| label: fig-wls
 #| fig-cap: "Simulated data example with heteroskedasticity. The gray line represents the underlying model; the dashed line is obtained from the WLS fit."
 
-p1 <- ggplot(data.frame(x, y), aes(x = x, y = y)) + 
-    geom_abline(intercept = 3, slope = -2, col = "gray50", lwd = 1.5) +
-    geom_abline(intercept = fit_wls$coefficients[2], 
-                slope = fit_wls$coefficients[1], lty = 2) +
-    geom_point()
-p2 <- ggplot(data.frame(x, y), aes(x = x, y = rstandard(fit_wls))) +
-    geom_hline(yintercept = 0, col = "gray50") +
-    geom_point() +
-    xlab("x") +
-    ylab("Standardized residuals")
-p1 + p2 +
-    plot_annotation(tag_levels = 'A')
+fig, axes = plt.subplots(1, 2, figsize = (12, 4))
+
+# A: data with underlying and WLS (manual transform) line
+axes[0].scatter(df["x"], df["y"], s = 20)
+axes[0].plot(x_line, 3 + (-2) * x_line, color = "gray", linewidth = 1.5)
+
+# Mapping: Yt = a + b*Xt where a ≈ beta1, b ≈ beta0 in original y = beta0 + beta1 x
+a_hat = fit_wls.params["Intercept"]  # intercept ~ beta1
+b_hat = fit_wls.params["Xt"]         # slope on Xt ~ beta0
+axes[0].plot(x_line, b_hat + a_hat * x_line, linestyle = "--", color = "tab:blue")
+axes[0].set_xlabel("x")
+axes[0].set_ylabel("y")
+axes[0].set_title("A")
+
+# B: standardized residuals vs x (from transformed model)
+infl_w = fit_wls.get_influence()
+std_resid_w = infl_w.resid_studentized_internal
+axes[1].axhline(0, color = "gray", linewidth = 1)
+axes[1].scatter(df_t["x"], std_resid_w, s = 20)
+axes[1].set_xlabel("x")
+axes[1].set_ylabel("Standardized residuals")
+axes[1].set_title("B")
+
+plt.tight_layout()
+plt.show()
 ```
 :::
 
@@ -119,14 +153,14 @@ $$
 \hat{\boldsymbol{\beta}}=(\boldsymbol{X}^{\top}\boldsymbol{W}\boldsymbol{X})^{-1}\boldsymbol{X}^{\top}\boldsymbol{W}\boldsymbol{Y}.
 $${#eq-wls}
 
-To apply @eq-wls in R, specify the argument `weights`, and remember to take an inverse. 
+To apply @eq-wls, specify the argument `weights`, and remember to take an inverse. 
 Note that the coefficients are now labeled as expected.
 
-```{r}
+```{python}
 #| code-fold: false
 
-fit_wls2 <- lm(y ~ x, weights = 1/x^2)
-summary(fit_wls2)
+fit_wls2 = smf.wls("y ~ x", data = df, weights = 1.0 / (df["x"] ** 2)).fit()
+print(fit_wls2.summary())
 ```
 
 @Chatterjee:Hadi:2006 in Chapter 7 consider two more cases for applying WLS, both related to grouping. 
@@ -138,65 +172,77 @@ We skip those cases for now and revisit our data example from @sec-regression.
 
 First, use OLS to estimate the simple linear regression exploring dishwasher shipments (DISH) and private residential investments (RES) for several years.
 
-```{r}
+```{python}
 #| code-fold: false
 
-D <- read.delim("data/dish.txt") %>% 
-    rename(Year = YEAR)
-modDish_ols <- lm(DISH ~ RES, data = D)
+D = pd.read_csv("data/dish.txt", sep = "\t")
+if "YEAR" in D.columns:
+    D = D.rename(columns = {"YEAR": "Year"})
+modDish_ols = smf.ols("DISH ~ RES", data = D).fit()
 ```
 
-The plot in @fig-dishOLS indicates that the variance might be decreasing with higher investments.
+The plot in @fig-dishols indicates that the variance might be decreasing with higher investments.
 
-```{r}
-#| label: fig-dishOLS
+```{python}
+#| label: fig-dishols
 #| fig-cap: "OLS residuals vs. the predictor."
 
-ggplot(D, aes(x = RES, y = rstandard(modDish_ols))) +
-    geom_hline(yintercept = 0, col = "gray50") +
-    geom_point() +
-    xlab("Residential investments") +
-    ylab("Standardized residuals")
+fig, ax = plt.subplots(figsize = (6, 4))
+std_resid_dish_ols = modDish_ols.get_influence().resid_studentized_internal
+ax.axhline(0, color = "gray", linewidth = 1)
+ax.scatter(D["RES"], std_resid_dish_ols, s = 20)
+ax.set_xlabel("Residential investments")
+ax.set_ylabel("Standardized residuals")
+plt.tight_layout()
+plt.show()
 ```
 
 Apply the WLS:
 
-```{r}
+```{python}
 #| code-fold: false
 
-modDish_wls <- lm(DISH ~ RES, data = D, weights = RES^2)
+modDish_wls = smf.wls("DISH ~ RES", data = D, weights = (D["RES"] ** 2)).fit()
 ```
 
-In @fig-dishWLS we see minor changes in the slope (better fit?).
+In @fig-dishwls we see minor changes in the slope (better fit?).
 
-```{r}
-#| label: fig-dishWLS
+```{python}
+#| label: fig-dishwls
 #| fig-cap: "The regression fits (OLS -- solid line; WLS -- dashed line) and the WLS residuals vs. the predictor."
 
-p1 <- ggplot(D, aes(x = RES, y = DISH)) + 
-    geom_abline(intercept = modDish_wls$coefficients[1], 
-                slope = modDish_wls$coefficients[2], lty = 2) +
-    geom_abline(intercept = modDish_ols$coefficients[1], 
-                slope = modDish_ols$coefficients[2], 
-                col = "gray50") +
-    geom_point() +
-    xlab("Residential investments") + 
-    ylab("Dishwasher shipments")
-p2 <- ggplot(D, aes(x = RES, y = rstandard(modDish_wls))) +
-    geom_hline(yintercept = 0, col = "gray50") +
-    geom_point() +
-    xlab("Residential investments") +
-    ylab("Standardized residuals")
-p1 + p2 +
-    plot_annotation(tag_levels = 'A')
+fig, axes = plt.subplots(1, 2, figsize = (12, 4))
+
+# A: regression fits
+axes[0].scatter(D["RES"], D["DISH"], s = 20)
+res_line = np.linspace(D["RES"].min(), D["RES"].max(), 200)
+ols_b0, ols_b1 = modDish_ols.params["Intercept"], modDish_ols.params["RES"]
+wls_b0, wls_b1 = modDish_wls.params["Intercept"], modDish_wls.params["RES"]
+axes[0].plot(res_line, ols_b0 + ols_b1 * res_line, color = "gray")
+axes[0].plot(res_line, wls_b0 + wls_b1 * res_line, linestyle = "--", color = "tab:blue")
+axes[0].set_xlabel("Residential investments")
+axes[0].set_ylabel("Dishwasher shipments")
+axes[0].set_title("A")
+
+# B: standardized residuals from WLS vs RES (simple standardization)
+std_resid_dish_wls = (modDish_wls.resid / modDish_wls.resid.std(ddof = 1))
+axes[1].axhline(0, color = "gray", linewidth = 1)
+axes[1].scatter(D["RES"], std_resid_dish_wls, s = 20)
+axes[1].set_xlabel("Residential investments")
+axes[1].set_ylabel("Standardized residuals")
+axes[1].set_title("B")
+
+plt.tight_layout()
+plt.show()
 ```
 
 However, the residuals are still autocorrelated, which violates another assumption of the OLS and WLS methods:
 
-```{r}
+```{python}
 #| code-fold: false
 
-lawstat::runs.test(rstandard(modDish_wls))
+z_run, p_run = runstest_1samp(std_resid_dish_wls, correction = False)
+print(f"Runs test: z = {z_run:.4f}, p-value = {p_run:.4f}")
 ```
 :::
 
