@@ -4,6 +4,7 @@ matplotlib>=3.7
 seaborn>=0.12
 statsmodels>=0.14
 scipy>=1.10
+pingouin>=0.5
 pmdarima>=2.0
 arch>=6.3
 linearmodels>=5.2

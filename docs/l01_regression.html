@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>1&nbsp; Review of Linear Regression (Python) – Time Series Analysis in Python</title>
+<title>1&nbsp; Review of Linear Regression – Time Series Analysis in Python</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -55,7 +55,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -106,7 +125,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="nav-sidebar floating quarto-light">
@@ -118,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./l01_regression.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Review of Linear Regression (Python)</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./l01_regression.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Review of Linear Regression</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -128,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
@@ -162,7 +211,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./l01_regression.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Review of Linear Regression (Python)</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Review of Linear Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -181,34 +230,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#diagnostics-for-the-simple-linear-regression-residual-analysis" id="toc-diagnostics-for-the-simple-linear-regression-residual-analysis" class="nav-link active" data-scroll-target="#diagnostics-for-the-simple-linear-regression-residual-analysis"><span class="header-section-number">2</span> Diagnostics for the simple linear regression: residual analysis</a>
+  <li><a href="#diagnostics-for-the-simple-linear-regression-residual-analysis" id="toc-diagnostics-for-the-simple-linear-regression-residual-analysis" class="nav-link active" data-scroll-target="#diagnostics-for-the-simple-linear-regression-residual-analysis"><span class="header-section-number">1.1</span> Diagnostics for the simple linear regression: residual analysis</a>
   <ul class="collapse">
-  <li><a href="#homoskedasticity" id="toc-homoskedasticity" class="nav-link" data-scroll-target="#homoskedasticity"><span class="header-section-number">2.1</span> Homoskedasticity</a>
+  <li><a href="#homoskedasticity" id="toc-homoskedasticity" class="nav-link" data-scroll-target="#homoskedasticity"><span class="header-section-number">1.1.1</span> Homoskedasticity</a></li>
+  <li><a href="#uncorrelatedness" id="toc-uncorrelatedness" class="nav-link" data-scroll-target="#uncorrelatedness"><span class="header-section-number">1.1.2</span> Uncorrelatedness</a></li>
+  <li><a href="#normality" id="toc-normality" class="nav-link" data-scroll-target="#normality"><span class="header-section-number">1.1.3</span> Normality</a></li>
+  <li><a href="#summary-of-the-simple-linear-regression-residual-diagnostics" id="toc-summary-of-the-simple-linear-regression-residual-diagnostics" class="nav-link" data-scroll-target="#summary-of-the-simple-linear-regression-residual-diagnostics"><span class="header-section-number">1.1.4</span> Summary of the simple linear regression residual diagnostics</a></li>
+  </ul></li>
+  <li><a href="#multiple-linear-regression" id="toc-multiple-linear-regression" class="nav-link" data-scroll-target="#multiple-linear-regression"><span class="header-section-number">1.2</span> Multiple linear regression</a>
   <ul class="collapse">
-  <li><a href="#example-dishwasher-shipments-model-and-patterns-in-residuals" id="toc-example-dishwasher-shipments-model-and-patterns-in-residuals" class="nav-link" data-scroll-target="#example-dishwasher-shipments-model-and-patterns-in-residuals"><span class="header-section-number">2.1.1</span> Example: Dishwasher shipments model and patterns in residuals</a></li>
+  <li><a href="#summary-of-the-multiple-linear-regression-residual-diagnostics" id="toc-summary-of-the-multiple-linear-regression-residual-diagnostics" class="nav-link" data-scroll-target="#summary-of-the-multiple-linear-regression-residual-diagnostics"><span class="header-section-number">1.2.1</span> Summary of the multiple linear regression residual diagnostics</a></li>
   </ul></li>
-  <li><a href="#uncorrelatedness" id="toc-uncorrelatedness" class="nav-link" data-scroll-target="#uncorrelatedness"><span class="header-section-number">2.2</span> Uncorrelatedness</a>
-  <ul class="collapse">
-  <li><a href="#durbinwatson-test" id="toc-durbinwatson-test" class="nav-link" data-scroll-target="#durbinwatson-test"><span class="header-section-number">2.2.1</span> Durbin–Watson test</a></li>
-  <li><a href="#runs-test" id="toc-runs-test" class="nav-link" data-scroll-target="#runs-test"><span class="header-section-number">2.2.2</span> Runs test</a></li>
-  </ul></li>
-  <li><a href="#normality" id="toc-normality" class="nav-link" data-scroll-target="#normality"><span class="header-section-number">2.3</span> Normality</a></li>
-  <li><a href="#multiple-linear-regression-mlr" id="toc-multiple-linear-regression-mlr" class="nav-link" data-scroll-target="#multiple-linear-regression-mlr"><span class="header-section-number">2.4</span> Multiple linear regression (MLR)</a></li>
-  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">1.3</span> Conclusion</a></li>
+  <li><a href="#sec-diffsign" id="toc-sec-diffsign" class="nav-link" data-scroll-target="#sec-diffsign"><span class="header-section-number">1.4</span> Appendix</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/vlyubchich/tsapy/edit/master/l01_regression.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/vlyubchich/tsapy/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content column-body" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Review of Linear Regression (Python)</span></h1>
+<h1 class="title"><span id="sec-regression" class="quarto-section-identifier"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Review of Linear Regression</span></span></h1>
 </div>
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-body">
 
     
   
@@ -220,213 +268,592 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="411bd31b" class="cell" data-execution_count="1">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setup: libraries and plotting theme</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.stats.stattools <span class="im">import</span> durbin_watson</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.sandbox.stats.runs <span class="im">import</span> runstest_1samp</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> shapiro</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">"whitegrid"</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>np.set_printoptions(precision<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<p>After this lecture, you should be competent (again) in assessing violations of various assumptions of linear regression models, particularly assumptions about model residuals, by being able to apply visual assessments and formal statistical tests, and interpret the results and effects of the violations.</p>
+<p><strong>Objectives</strong></p>
+<ol type="1">
+<li>Recall the form and standard assumptions of linear regression models.</li>
+<li>Recall and apply standard methods of assessing and testing homogeneity of variance and normality of residuals.</li>
+<li>Define and test independence (most often, uncorrelatedness) of regression model residuals.</li>
+</ol>
+<p><strong>Reading materials</strong></p>
+<ul>
+<li>Chapters 3–4 in <span class="citation" data-cites="Chatterjee:Hadi:2006">Chatterjee and Hadi (<a href="references.html#ref-Chatterjee:Hadi:2006" role="doc-biblioref">2006</a>)</span></li>
+</ul>
+<p><a href="https://youtu.be/egZwXSAXULo"><strong>Audio overview</strong></a></p>
+<section id="diagnostics-for-the-simple-linear-regression-residual-analysis" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="diagnostics-for-the-simple-linear-regression-residual-analysis"><span class="header-section-number">1.1</span> Diagnostics for the simple linear regression: residual analysis</h2>
+<p>Given a simple linear regression (SLR) model <span class="math display">\[
+Y_{t} = \beta_{0} + \beta_{1} X_{t} + \epsilon_{t},
+\]</span> where <span class="math inline">\(Y_{t}\)</span> is the dependent variable and <span class="math inline">\(X_{t}\)</span> is the regressor (independent, predictor) variable, <span class="math inline">\(t = 1,\dots,n\)</span>, and <span class="math inline">\(n\)</span> is the sample size.</p>
+<p><strong>The Gauss–Markov theorem</strong></p>
+<p>If <span class="math inline">\(\epsilon_{t}\)</span> are uncorrelated random variables with common variance, then of all possible estimators <span class="math inline">\(\beta^{\ast}_{0}\)</span> and <span class="math inline">\(\beta^{\ast}_{1}\)</span> that are linear functions of <span class="math inline">\(Y_{t}\)</span>, the least squares estimators have the smallest variance.</p>
+<p>Thus, the ordinary least squares (OLS) assumptions are:</p>
+<ol type="1">
+<li><p>the residuals <span class="math inline">\(\epsilon_{t}\)</span> have common variance (<span class="math inline">\(\epsilon_{t}\)</span> are homoskedastic);</p></li>
+<li><p>the residuals <span class="math inline">\(\epsilon_{t}\)</span> are uncorrelated;</p>
+<p>to provide prediction intervals (PIs), confidence intervals (CIs), and to test hypotheses about the parameters in our model, we also need to assume that</p></li>
+<li><p>the residuals <span class="math inline">\(\epsilon_{t}\)</span> are normally distributed (<span class="math inline">\(\epsilon_{t} \sim N (0, \sigma^{ 2} )\)</span>).</p></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<section id="diagnostics-for-the-simple-linear-regression-residual-analysis" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Diagnostics for the simple linear regression: residual analysis</h1>
-<section id="homoskedasticity" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="homoskedasticity"><span class="header-section-number">2.1</span> Homoskedasticity</h2>
-<div id="6694af81" class="cell" data-execution_count="2">
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If the residuals are independent and identically distributed and normal (<span class="math inline">\(\epsilon_{t} \sim\)</span> i.i.d. <span class="math inline">\(N(0, \sigma^{2}\)</span>)), then all three above properties are automatically satisfied. In this case, <span class="math inline">\(\epsilon_{t}\)</span> are not only uncorrelated but are independent. To be independent is a much stronger property than to be uncorrelated.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>While a given model may still have useful predictive value even when the OLS assumptions are violated, the confidence intervals, prediction intervals, and <span class="math inline">\(p\)</span>-values associated with the <span class="math inline">\(t\)</span>-statistics will generally be incorrect when the OLS assumptions do not hold.</p>
+</div>
+</div>
+<p>A basic technique for investigating the aptness of a regression model is based on analyzing the residuals <span class="math inline">\(\epsilon_{t}\)</span>. In a residual analysis, we attempt to assess the validity of the OLS assumptions by examining the estimated residuals <span class="math inline">\(\hat{\epsilon}_{1}, \dots, \hat{\epsilon}_{n}\)</span> to see if they satisfy the imposed conditions. If the model is apt, the observed residuals should reflect the assumptions listed above.</p>
+<p>We perform our diagnostics analysis from a step-by-step verification of each assumption. We start with visual diagnostics, then proceed with formal tests. A lot of useful diagnostic information may be obtained from a residual plot.</p>
+<section id="homoskedasticity" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="homoskedasticity"><span class="header-section-number">1.1.1</span> Homoskedasticity</h3>
+<p>We plot the residuals <span class="math inline">\(\hat{\epsilon}_{t}\)</span> vs.&nbsp;time, fitted values <span class="math inline">\(\hat{Y}_{t}\)</span>, and predictor values <span class="math inline">\(X_t\)</span>. If the assumption of constant variance is satisfied, <span class="math inline">\(\hat{\epsilon}_{t}\)</span> fluctuate around the zero mean with more or less constant amplitude and this amplitude does not change with time, fitted values <span class="math inline">\(\hat{Y}_{t}\)</span>, and predictor values <span class="math inline">\(X_t\)</span>.</p>
+<p>If the (linear) model is not appropriate, the mean of the residuals may be non-constant, i.e., not always 0. <a href="#fig-idealresiduals" class="quarto-xref">Figure&nbsp;<span>1.1</span></a> shows an example of a random pattern that we would like the residuals to have (no systematic patterns).</p>
+<div id="cell-fig-idealresiduals" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated "ideal" residuals</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n, m, s <span class="op">=</span> <span class="dv">26</span>, <span class="fl">0.0</span>, <span class="fl">522.0</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.random.normal(loc<span class="op">=</span>m, scale<span class="op">=</span>s, size<span class="op">=</span>n)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">3</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ax.plot(x, lw<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">0</span>, ls<span class="op">=</span><span class="st">"--"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"A time series plot of 'ideal' residuals (i.i.d. normal)"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"t"</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Residuals"</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>n, m, s <span class="op">=</span> <span class="dv">26</span>, <span class="fl">0.0</span>, <span class="fl">522.0</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.random.normal(loc <span class="op">=</span> m, scale <span class="op">=</span> s, size <span class="op">=</span> n)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize <span class="op">=</span> (<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>ax.plot(x, marker <span class="op">=</span> <span class="st">'o'</span>, markersize <span class="op">=</span> <span class="dv">4</span>, linewidth <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>ax.axhline(<span class="dv">0</span>, linestyle <span class="op">=</span> <span class="st">'--'</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Time'</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="l01_regression_files/figure-html/cell-3-output-1.png" width="688" height="307" class="figure-img"></p>
+<div id="fig-idealresiduals" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-idealresiduals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="l01_regression_files/figure-html/fig-idealresiduals-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-idealresiduals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: A time series plot of ‘ideal’ residuals. These residuals <span class="math inline">\(x_t\)</span> are simulated i.i.d. normal.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<section id="example-dishwasher-shipments-model-and-patterns-in-residuals" class="level3" data-number="2.1.1">
-<h3 data-number="2.1.1" class="anchored" data-anchor-id="example-dishwasher-shipments-model-and-patterns-in-residuals"><span class="header-section-number">2.1.1</span> Example: Dishwasher shipments model and patterns in residuals</h3>
-<div id="bf592b6d" class="cell" data-execution_count="3">
+<p>What can we notice in a residual plot?</p>
+<ul>
+<li>Change of variability with time indicates heterogeneity of variance of the residuals.</li>
+<li>Obvious lack of symmetry (around 0) in the plot suggests a lack of normality or presence of outliers.</li>
+<li>Systematic trends in the residuals suggest correlations between the residuals or inadequateness of the proposed model.</li>
+</ul>
+<p>Sometimes it is possible to transform the dependent or independent variables to remedy these problems, i.e., to get rid of the correlated residuals or to stabilize the variance (see <span class="quarto-unresolved-ref">?sec-wls</span> and <span class="quarto-unresolved-ref">?sec-gls</span>). Otherwise, we need to change (re-specify) the model.</p>
+<p>A useful technique that can guide us in this process is to plot <span class="math inline">\(\hat{\epsilon}_{t}\)</span> vs.&nbsp;<span class="math inline">\(\hat{Y}_{t}\)</span> and <span class="math inline">\(\hat{\epsilon}_{t}\)</span> vs.&nbsp;each predictor <span class="math inline">\(X_t\)</span>. Similarly to their time series plot, <span class="math inline">\(\hat{\epsilon}_{t}\)</span> should fluctuate around the zero mean with more or less constant amplitude.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Example: Dishwasher shipments model and patterns in residuals
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#fig-dishresiduals" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> shows the Python code and residuals of a simple linear regression exploring dishwasher shipments (DISH) and private residential investments (RES) for several years.</p>
+<p>How different are the patterns in <a href="#fig-dishresiduals" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> from those in <a href="#fig-idealresiduals" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>?</p>
+<div id="cell-fig-dishresiduals" class="cell" data-fig-height="3" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load dishwasher data (tab-delimited) and fit SLR DISH ~ RES</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> pd.read_csv(<span class="st">"data/dish.txt"</span>, sep<span class="op">=</span><span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"YEAR"</span> <span class="kw">in</span> D.columns:</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> D.rename(columns<span class="op">=</span>{<span class="st">"YEAR"</span>: <span class="st">"Year"</span>})</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>mod1 <span class="op">=</span> smf.ols(<span class="st">"DISH ~ RES"</span>, data<span class="op">=</span>D).fit()</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>resid1 <span class="op">=</span> mod1.resid</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>fitted1 <span class="op">=</span> mod1.fittedvalues</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">3</span>))</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs time</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(D[<span class="st">"Year"</span>], resid1)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axhline(<span class="dv">0</span>, ls<span class="op">=</span><span class="st">"--"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Residuals"</span>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Residuals vs time"</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs fitted</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(fitted1, resid1, s<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="dv">0</span>, ls<span class="op">=</span><span class="st">"--"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Fitted values"</span>)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Residuals"</span>)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Residuals vs fitted"</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs predictor</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].scatter(D[<span class="st">"RES"</span>], resid1, s<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].axhline(<span class="dv">0</span>, ls<span class="op">=</span><span class="st">"--"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_xlabel(<span class="st">"Residential investments (RES)"</span>)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_ylabel(<span class="st">"Residuals"</span>)</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_title(<span class="st">"Residuals vs RES"</span>)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> pd.read_csv(<span class="st">"data/dish.txt"</span>, sep <span class="op">=</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"YEAR"</span> <span class="kw">in</span> D.columns:</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> D.rename(columns <span class="op">=</span> {<span class="st">"YEAR"</span>: <span class="st">"Year"</span>})</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>mod1 <span class="op">=</span> smf.ols(<span class="st">"DISH ~ RES"</span>, data <span class="op">=</span> D).fit()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>resid1 <span class="op">=</span> mod1.resid</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>fitted1 <span class="op">=</span> mod1.fittedvalues</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize <span class="op">=</span> (<span class="dv">12</span>, <span class="dv">3</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs time</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(D[<span class="st">"Year"</span>], resid1, marker <span class="op">=</span> <span class="st">'o'</span>, markersize <span class="op">=</span> <span class="dv">4</span>, linewidth <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axhline(<span class="dv">0</span>, linestyle <span class="op">=</span> <span class="st">'--'</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'A'</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs fitted</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(fitted1, resid1, s <span class="op">=</span> <span class="dv">20</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="dv">0</span>, linestyle <span class="op">=</span> <span class="st">'--'</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">'Fitted values'</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'B'</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs predictor</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].scatter(D[<span class="st">"RES"</span>], resid1, s <span class="op">=</span> <span class="dv">20</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].axhline(<span class="dv">0</span>, linestyle <span class="op">=</span> <span class="st">'--'</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_xlabel(<span class="st">'Residential investments (RES)'</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">2</span>].set_title(<span class="st">'C'</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="l01_regression_files/figure-html/cell-4-output-1.png" width="1136" height="272" class="figure-img"></p>
+<div id="fig-dishresiduals" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dishresiduals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="l01_regression_files/figure-html/fig-dishresiduals-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dishresiduals-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.2: Estimated residuals plotted vs.&nbsp;time, fitted values, and predictor.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+<p>In <a href="#fig-dishresiduals" class="quarto-xref">Figure&nbsp;<span>1.2</span></a>, we see a pattern of residuals increasing in time, and a pattern of lower variability for high fitted values or high residential investments. Thus, the assumption of homoskedasticity is violated. In <a href="#fig-idealresiduals" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>, no such patterns are observed.</p>
+</div>
+</div>
 </section>
-</section>
-<section id="uncorrelatedness" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="uncorrelatedness"><span class="header-section-number">2.2</span> Uncorrelatedness</h2>
-<section id="durbinwatson-test" class="level3" data-number="2.2.1">
-<h3 data-number="2.2.1" class="anchored" data-anchor-id="durbinwatson-test"><span class="header-section-number">2.2.1</span> Durbin–Watson test</h3>
-<div id="1b5c2a24" class="cell" data-execution_count="4">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dw <span class="op">=</span> durbin_watson(resid1)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"Durbin-Watson"</span>: dw})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<section id="uncorrelatedness" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="uncorrelatedness"><span class="header-section-number">1.1.2</span> Uncorrelatedness</h3>
+<p>It is a deep topic that we shall discuss many times in different variations in the future. When observations are obtained in a time sequence (the topic of time series analysis and our course), there is a <em>high</em> possibility that the errors <span class="math inline">\(\epsilon_{t}\)</span> are correlated. For instance, if the residual is positive (or negative) for a given day <span class="math inline">\(t\)</span>, it is likely that the residual for the following day <span class="math inline">\(t+1\)</span> is also positive (or negative). Such residuals are said to be <em>autocorrelated</em> (i.e., serially correlated). Autocorrelation of many environmental time series is positive.</p>
+<p>When the residuals <span class="math inline">\(\epsilon_{t}\)</span> are related over time, a model for the residuals frequently employed is the first-order autoregressive model, i.e., the AR(1) model.</p>
+<p>The <em>autoregressive model of the first order</em>, AR(1), is defined as <span class="math display">\[
+\epsilon_{t} = \rho \epsilon_{t - 1} + u_{t},
+\]</span> where <span class="math inline">\(\rho\)</span> is the autoregression coefficient (<span class="math inline">\(- 1 &lt; \rho &lt; 1\)</span>) and <span class="math inline">\(u_{t}\)</span> is an uncorrelated <span class="math inline">\(N (0, \sigma^{2})\)</span> time series.</p>
+<p>The model assumes that the residual <span class="math inline">\(\epsilon_{t}\)</span> at the time <span class="math inline">\(t\)</span> contains a component resulting from the residual <span class="math inline">\(\epsilon_{t - 1}\)</span> at the time <span class="math inline">\(t - 1\)</span> and a random disturbance <span class="math inline">\(u_{t}\)</span> that is independent of the earlier periods.</p>
+<p><strong>Effects of autocorrelation</strong></p>
+<p>If the OLS method is employed for the parameter estimation and the residuals <span class="math inline">\(\epsilon_{t}\)</span> are autocorrelated of the first order, then the consequences are:</p>
+<ul>
+<li>The OLS estimators will still be unbiased, but they no longer have the minimum variance property (see the Gauss–Markov theorem); they tend to be relatively inefficient.</li>
+<li>The residual mean square error (MSE) can seriously underestimate the true variance of the error terms in the model.</li>
+<li>Standard procedures for CI, PI, and tests using the <span class="math inline">\(F\)</span> and Student’s <span class="math inline">\(t\)</span> distributions are no longer strictly applicable.</li>
+</ul>
+<p>For example, see Section 5.2 in <span class="citation" data-cites="Chatterjee:Simonoff:2013">Chatterjee and Simonoff (<a href="references.html#ref-Chatterjee:Simonoff:2013" role="doc-biblioref">2013</a>)</span> for more details.</p>
+<p><strong>Durbin–Watson test</strong></p>
+<p>A widely used test for examining whether the residuals in a regression model are correlated is the Durbin–Watson test. This test is based on the AR(1) model for <span class="math inline">\(\epsilon_{t}\)</span>. The one-tail test alternatives are <span class="math display">\[
+\begin{align}
+H_{0}{:} ~ \rho = 0 &amp; ~~ vs. ~~ H_{1}{:} ~ \rho &gt; 0,\\
+H_{0}{:} ~ \rho = 0 &amp; ~~ vs. ~~ H_{1}{:} ~ \rho &lt; 0,
+\end{align}
+\]</span> and the two-tail test is <span class="math display">\[
+H_{0}{:} ~ \rho = 0 ~~ vs. ~~ H_{1}{:} ~ \rho \neq 0.\\
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When dealing with real data, positive autocorrelation is usually the case.</p>
+</div>
+</div>
+<p>The Durbin–Watson test statistic DW is based on the differences between the adjacent residuals, <span class="math inline">\(\epsilon_{t} - \epsilon_{t - 1}\)</span>, and is of the following form: <span class="math display">\[
+\text{DW} = \frac{\sum^{n}_{t = 2} \left( \epsilon_{t} - \epsilon_{t - 1} \right)^{2}}{\sum^{n}_{t = 1} \epsilon^{2}_{t}},
+\]</span> where <span class="math inline">\(\epsilon_{t}\)</span> is the regression residual at the time <span class="math inline">\(t\)</span> and <span class="math inline">\(n\)</span> is the number of observations.</p>
+<p>The DW statistic takes on values in the range <span class="math inline">\([0, 4]\)</span>. In fact,</p>
+<ul>
+<li>When <span class="math inline">\(\epsilon_{t}\)</span> are positively correlated, adjacent residuals tend to be of similar magnitude so that the numerator of DW will be relatively small or 0.</li>
+<li>When <span class="math inline">\(\epsilon_{t}\)</span> are negatively correlated, adjacent residuals tend to be of similar magnitude but with the opposite sign so that the numerator of DW will be relatively large or equal to 4.</li>
+</ul>
+<p>Hence, low DW corresponds to positive autocorrelation. Values of DW that tend towards 4 are in the region for negative autocorrelation.</p>
+<p>The exact action limit for the Durbin–Watson test is difficult to calculate. Hence, the test is used with a lower bound <span class="math inline">\(d_{L}\)</span> and an upper bound <span class="math inline">\(d_{U}\)</span>. We may use <a href="#tbl-DW" class="quarto-xref">Table&nbsp;<span>1.1</span></a> as a rule of thumb.</p>
+<div id="tbl-DW" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-DW-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1.1: Regions of rejection of the null hypothesis for the Durbin–Watson test
+</figcaption>
+<div aria-describedby="tbl-DW-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>from 0 to <span class="math inline">\(d_{L}\)</span></th>
+<th>from <span class="math inline">\(d_{L}\)</span> to <span class="math inline">\(d_{U}\)</span></th>
+<th>from <span class="math inline">\(d_{U}\)</span> to <span class="math inline">\(4 - d_{U}\)</span></th>
+<th>from <span class="math inline">\(4 - d_{U}\)</span> to <span class="math inline">\(4 - d_{L}\)</span></th>
+<th>from <span class="math inline">\(4 - d_{L}\)</span> to 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Reject <span class="math inline">\(H_{0}\)</span>, positive autocorrelation</td>
+<td>Neither accept <span class="math inline">\(H_{1}\)</span> or reject <span class="math inline">\(H_{0}\)</span></td>
+<td>Do not reject <span class="math inline">\(H_{0}\)</span></td>
+<td>Neither accept <span class="math inline">\(H_{1}\)</span> or reject <span class="math inline">\(H_{0}\)</span></td>
+<td>Reject <span class="math inline">\(H_{0}\)</span>, negative autocorrelation</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The critical values <span class="math inline">\(d_{L}\)</span> and <span class="math inline">\(d_{U}\)</span> have been tabulated for combinations of various sample sizes, significance levels, and number of regressors in a model. For large samples, a normal approximation can be used <span class="citation" data-cites="Chatterjee:Simonoff:2013">(<a href="references.html#ref-Chatterjee:Simonoff:2013" role="doc-biblioref">Chatterjee and Simonoff 2013</a>)</span>: <span class="math display">\[
+z = \left(\frac{\text{DW}}{2} - 1 \right)\sqrt{n}.
+\]</span> Statistical software packages usually provide exact <span class="math inline">\(p\)</span>-values based on the null distribution of the test statistic (a linear combination of <span class="math inline">\(\chi^2\)</span> variables).</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Example: Dishwasher residuals DW test
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Apply the Durbin–Watson test to the residuals from the dishwashers example, i.e., <code>DISH</code> vs.&nbsp;<code>RES</code>, using the Python package <code>statsmodels</code>.</p>
+<div id="7f00617f" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dw_stat <span class="op">=</span> durbin_watson(resid1)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Durbin-Watson statistic: </span><span class="sc">{</span>dw_stat<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Approximate p-value calculation</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> (dw_stat <span class="op">/</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> np.sqrt(<span class="bu">len</span>(resid1))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>p_value_two_sided <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> norm.sf(np.<span class="bu">abs</span>(z))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Two-sided p-value: </span><span class="sc">{</span>p_value_two_sided<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{'Durbin-Watson': np.float64(0.5713900110592645)}</code></pre>
+<pre><code>Durbin-Watson statistic: 0.5714
+Two-sided p-value: 0.0003</code></pre>
 </div>
 </div>
-</section>
-<section id="runs-test" class="level3" data-number="2.2.2">
-<h3 data-number="2.2.2" class="anchored" data-anchor-id="runs-test"><span class="header-section-number">2.2.2</span> Runs test</h3>
-<div id="764071af" class="cell" data-execution_count="5">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># H0: sequence is random (no persistence). Use zero median by default.</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The function returns (z-statistic, p-value).</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>zstat, pval <span class="op">=</span> runstest_1samp(resid1, correction<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"runs_z"</span>: <span class="bu">float</span>(zstat), <span class="st">"runs_pvalue"</span>: <span class="bu">float</span>(pval)})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<p>Based on the low <span class="math inline">\(p\)</span>-value we can reject the <span class="math inline">\(H_{0}\)</span>: <span class="math inline">\(\rho = 0\)</span> at the 95% confidence level and accept the alternative <span class="math inline">\(H_{1}\)</span>: <span class="math inline">\(\rho &gt; 0\)</span>.</p>
+</div>
+</div>
+<p><strong>Runs test</strong></p>
+<p>Departures of randomness can take so many forms that no single test for randomness is best for all situations. For instance, one of the most common departures from randomness is the tendency of a sequence to persist in its direction of movement.</p>
+<p>We can count the number of times a sequence of observations crossed a cut-off line, for example, the median line, and use this information to assess the randomness of <span class="math inline">\(\epsilon_t\)</span>. Alternatively, we count successions of positive or negative differences (see <a href="#sec-diffsign" class="quarto-xref"><span>Section 1.4</span></a> on the difference sign test). Each such succession is called a <em>run</em>.</p>
+<p>The formal test is the following. When a sequence of <span class="math inline">\(N\)</span> observations with <span class="math inline">\(n\)</span> observations in positive runs and <span class="math inline">\(m\)</span> observations in negative runs is a random process with independent values generated from a continuous distribution, then the sampling distribution of the number of runs <span class="math inline">\(R\)</span> has the mean and variance <span class="math display">\[
+\mathrm{E}(R) = \frac{1 + 2nm}{N}, \qquad \sigma^2(R) = \frac{2nm(2nm-n-m)}{N^2(N-1)},
+\]</span> where <span class="math inline">\(N = n + m\)</span> is the total sample size.</p>
+<p>The only assumption for this test is that all sample observations come from a continuous distribution.</p>
+<p>The two-tail alternative is as follows</p>
+<ul>
+<li><span class="math inline">\(H_{0}\)</span>: Sequence is generated by a random process;</li>
+<li><span class="math inline">\(H_{1}\)</span>: Sequence is generated by a process containing either persistence or frequent changes in direction.</li>
+</ul>
+<p>When positive autocorrelation (or persistence) is present, <span class="math inline">\(R\)</span> will be small. On the other hand, if the process involves frequent changes in direction (negative autocorrelation or anti-persistence), <span class="math inline">\(R\)</span> will be too large.</p>
+<p>When the number of observations is sufficiently large, i.e., <span class="math inline">\(N &gt; 30\)</span>, the runs test statistic <span class="math inline">\(R\)</span> is based on the standardized normal test statistic <span class="math display">\[
+z = \frac{R - \mathrm{E}(R)}{ \sigma(R)}.
+\]</span> Here <span class="math inline">\(z\)</span> follows approximately a standard normal distribution.</p>
+<p>Runs test is easy to interpret. Runs test allows assessing only the first-order serial correlation in the residuals, i.e., to test whether two residuals that are one lag apart are correlated.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Example: Dishwasher residuals runs test
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div id="a3effaec" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Runs test for simulated data</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>z_x, p_x <span class="op">=</span> runstest_1samp(x, correction <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Runs test for simulated data: z = </span><span class="sc">{</span>z_x<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>p_x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Runs test for residuals</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>z_resid, p_resid <span class="op">=</span> runstest_1samp(resid1, correction <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Runs test for residuals: z = </span><span class="sc">{</span>z_resid<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>p_resid<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{'runs_z': -2.746790210287299, 'runs_pvalue': 0.006018161619613106}</code></pre>
+<pre><code>Runs test for simulated data: z = 0.8366, p-value = 0.4028
+Runs test for residuals: z = -2.7468, p-value = 0.0060</code></pre>
+</div>
+</div>
+<p>The <span class="math inline">\(p\)</span>-value for the runs test for the residuals is very low, which supports the findings of the DW test that residuals are first-order serially correlated.</p>
 </div>
 </div>
 </section>
-</section>
-<section id="normality" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="normality"><span class="header-section-number">2.3</span> Normality</h2>
-<div id="c2150ad8" class="cell" data-execution_count="6">
+<section id="normality" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="normality"><span class="header-section-number">1.1.3</span> Normality</h3>
+<p>There are two major ways of checking normality. Graphical methods visualize differences between empirical data and theoretical normal distribution. Numerical methods conduct statistical tests on the null hypothesis that the variable is normally distributed.</p>
+<p><strong>Graphical methods</strong></p>
+<p>Graphical methods visualize the data using graphs, such as histograms, stem-and-leaf plots, box plots, etc. For example, <a href="#fig-histograms" class="quarto-xref">Figure&nbsp;<span>1.3</span></a> shows a histogram of the simulated normally distributed data and the residuals from the dishwasher example with superimposed normal curves with the corresponding mean and standard deviation.</p>
+<div id="cell-fig-histograms" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Histograms of simulated normal data and residuals</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].hist(x, bins<span class="op">=</span><span class="dv">10</span>, density<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"0.6"</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Random normal values"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Density"</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].hist(resid1, bins<span class="op">=</span><span class="dv">10</span>, density<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"0.6"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Model residuals"</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Density"</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Histogram for simulated normal values</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].hist(x, bins <span class="op">=</span> <span class="dv">10</span>, density <span class="op">=</span> <span class="va">True</span>, color <span class="op">=</span> <span class="st">'grey'</span>, alpha <span class="op">=</span> <span class="fl">0.7</span>, edgecolor <span class="op">=</span> <span class="st">'black'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>x_range <span class="op">=</span> np.linspace(x.<span class="bu">min</span>(), x.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(x_range, norm.pdf(x_range, loc <span class="op">=</span> np.mean(x), scale <span class="op">=</span> np.std(x, ddof <span class="op">=</span> <span class="dv">1</span>)), </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>             color <span class="op">=</span> <span class="st">'black'</span>, linewidth <span class="op">=</span> <span class="dv">2</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">'Density'</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'Random normal values'</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Histogram for residuals</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].hist(resid1, bins <span class="op">=</span> <span class="dv">10</span>, density <span class="op">=</span> <span class="va">True</span>, color <span class="op">=</span> <span class="st">'grey'</span>, alpha <span class="op">=</span> <span class="fl">0.7</span>, edgecolor <span class="op">=</span> <span class="st">'black'</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>resid_range <span class="op">=</span> np.linspace(resid1.<span class="bu">min</span>(), resid1.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].plot(resid_range, norm.pdf(resid_range, loc <span class="op">=</span> np.mean(resid1), scale <span class="op">=</span> np.std(resid1, ddof <span class="op">=</span> <span class="dv">1</span>)), </span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>             color <span class="op">=</span> <span class="st">'black'</span>, linewidth <span class="op">=</span> <span class="dv">2</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">'Density'</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'Model residuals'</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="l01_regression_files/figure-html/cell-7-output-1.png" width="944" height="368" class="figure-img"></p>
+<div id="fig-histograms" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-histograms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="l01_regression_files/figure-html/fig-histograms-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-histograms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.3: Histograms of the simulated normally distributed values and estimated regression residuals.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div id="2555fbe6" class="cell" data-execution_count="7">
+<p>Another very popular graphical method of assessing normality is the quantile-quantile (Q-Q) plot. The Q-Q plot compares the ordered values of a variable with the corresponding ordered values of the normal distribution.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Q-Q plots can also be used to compare sample quantiles with quantiles of other, not normal, distribution (e.g., <span class="math inline">\(t\)</span> or gamma distribution), or to compare quantiles of two samples (to assess if both samples come from the same, unspecified, distribution).</p>
+</div>
+</div>
+<p>Let <span class="math inline">\(X\)</span> be a random variable having the property that the equation <span class="math display">\[
+\Pr \left( X \leqslant x \right) = \alpha
+\]</span> has a unique solution <span class="math inline">\(x = x_{(\alpha)}\)</span> for each <span class="math inline">\(0 &lt; \alpha &lt; 1\)</span>. That is, there exists <span class="math inline">\(x_{(\alpha)}\)</span> such that <span id="eq-prob"><span class="math display">\[
+\Pr \left( X \leqslant x_{(\alpha)} \right) = \alpha
+\tag{1.1}\]</span></span> and no other value of <span class="math inline">\(x\)</span> satisfies <a href="#eq-prob" class="quarto-xref">Equation&nbsp;<span>1.1</span></a>. Then we will call <span class="math inline">\(x_{(\alpha)}\)</span> the <span class="math inline">\(\alpha\)</span>th <em>(population) quantile</em> of <span class="math inline">\(X\)</span>. Note that any normal distribution has this uniqueness property. If we consider a standard normal <span class="math inline">\(Z \sim N(0, 1)\)</span>, then some well-known quantiles are:</p>
+<ul>
+<li><span class="math inline">\(z_{(0.5)} = 0\)</span> (the median),</li>
+<li><span class="math inline">\(z_{(0.05)} = -1.645\)</span> and <span class="math inline">\(z_{(0.95)} = 1.645\)</span></li>
+<li><span class="math inline">\(z_{(0.025)} = -1.96\)</span> and <span class="math inline">\(z_{(0.975)} = 1.96\)</span></li>
+</ul>
+<p>We call the 0.25th, 0.5th, 0.75th quantiles the first, the second, and the third quartiles, respectively. The quartiles divide our data into 4 equal parts.</p>
+<p>Now suppose <span class="math inline">\(X \sim N (\mu, \sigma^{2})\)</span>. By standardizing to <span class="math inline">\(Z \sim N(0, 1)\)</span>, we obtain <span class="math display">\[
+\alpha = \Pr \left( X \leqslant x_{(\alpha)} \right) = \Pr \left( \frac{X - \mu}{ \sigma} \leqslant \frac{x_{(\alpha)} - \mu}{\sigma} \right) = \Pr \left( Z \leqslant \frac{x_{(\alpha)} - \mu}{ \sigma} \right) .
+\]</span></p>
+<p>We also have <span class="math inline">\(\alpha = \Pr (Z \leqslant z_{(\alpha)} )\)</span> by definition. It follows that <span class="math display">\[
+z_{(\alpha)} = \frac{x_{(\alpha)} - \mu}{ \sigma} ~~~~ \mbox{and hence} ~~~~ x_{(\alpha)} = \sigma z_{(\alpha)} + \mu.
+\]</span></p>
+<p>Thus, if <span class="math inline">\(X\)</span> is truly normal, a plot of the quantiles of <span class="math inline">\(X\)</span> vs.&nbsp;the quantiles of the standard normal distribution should yield a straight line. A plot of the quantiles of <span class="math inline">\(X\)</span> vs.&nbsp;the quantiles of <span class="math inline">\(Z\)</span> is called a Q-Q plot.</p>
+<p><strong>Estimating quantiles from data</strong></p>
+<p>Let <span class="math inline">\(X_{1}, \dots, X_{n}\)</span> be a sequence of observations. Ideally, <span class="math inline">\(X_{1}, \dots, X_{n}\)</span> should represent i.i.d. observations but we will be happy if preliminary tests indicate that they are homoskedastic and uncorrelated (see the previous sections). We order them from the smallest to the largest and indicate this using the notation <span class="math display">\[
+X_{(1/n)} &lt; X_{(2/n)} &lt; X_{(3/n)} &lt; \dots &lt; X_{\left((n - 1)/n\right)} &lt; X_{(n/n)}.
+\]</span></p>
+<p>The above ordering assumes no ties, but ties can be quite common in data, even continuous data, because of rounding. As long as the proportion of ties is small, this method can be used.</p>
+<p>Note that the proportion of observations less than or equal to <span class="math inline">\(X_{(k/n)}\)</span> is exactly <span class="math inline">\(k/n\)</span>. Hence <span class="math inline">\(X_{(k/n)}\)</span>, called the <span class="math inline">\(k\)</span>th <em>sample quantile</em>, is an estimate of the population quantile <span class="math inline">\(x_{(k/n)}\)</span>.</p>
+<p>The normal Q-Q plot is obtained by plotting the sample quantiles vs.&nbsp;the quantiles of the standard normal distribution. Python’s <code>statsmodels</code> library provides functions to create Q-Q plots with confidence bands.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Example: Dishwasher residuals normal Q-Q plot
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#fig-qq" class="quarto-xref">Figure&nbsp;<span>1.4</span></a> shows the Q-Q plots of the residuals from the dishwasher example and the simulated normal data with the same mean and standard deviation.</p>
+<div id="cell-fig-qq" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Q-Q plots</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>sm.ProbPlot(x).qqplot(line<span class="op">=</span><span class="st">"45"</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>])</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Random normal values"</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>sm.ProbPlot(resid1).qqplot(line<span class="op">=</span><span class="st">"45"</span>, ax<span class="op">=</span>axes[<span class="dv">1</span>])</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Model residuals"</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Q-Q plot for simulated normal values</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>pg.qqplot(x, dist <span class="op">=</span> <span class="st">'norm'</span>, confidence <span class="op">=</span> <span class="fl">0.95</span>, ax <span class="op">=</span> axes[<span class="dv">0</span>])</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'Random normal values'</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">'Standard normal quantiles'</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">'Sample quantiles'</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Q-Q plot for residuals</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>pg.qqplot(resid1, dist <span class="op">=</span> <span class="st">'norm'</span>, confidence <span class="op">=</span> <span class="fl">0.95</span>, ax <span class="op">=</span> axes[<span class="dv">1</span>])</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'Model residuals'</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">'Standard normal quantiles'</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">'Sample quantiles'</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="l01_regression_files/figure-html/cell-8-output-1.png" width="944" height="368" class="figure-img"></p>
+<div id="fig-qq" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-qq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="l01_regression_files/figure-html/fig-qq-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-qq-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.4: Normal Q-Q plots of the normally distributed simulated values <span class="math inline">\(x_t\)</span> and the dishwasher residuals.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div id="187e9e77" class="cell" data-execution_count="8">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shapiro–Wilk tests</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"shapiro_x"</span>: shapiro(x)})</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"shapiro_resid"</span>: shapiro(resid1)})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<p>Both Q-Q plots in <a href="#fig-qq" class="quarto-xref">Figure&nbsp;<span>1.4</span></a> show a good correspondence of the sample quantiles with theoretical normal quantiles, providing no sufficient evidence against normality of the underlying distributions.</p>
+</div>
+</div>
+<p>Although visually appealing, these graphical methods do not provide objective criteria to determine the normality of variables.</p>
+<p><strong>Shapiro–Wilk normality test</strong></p>
+<p>One of the most popular numerical methods for assessing normality is the Shapiro–Wilk (SW) test:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: the sample data come from a normally distributed population;</li>
+<li><span class="math inline">\(H_1\)</span>: the population is not normally distributed).</li>
+</ul>
+<p>The SW test is the ratio of the best estimator of the variance to the usual corrected sum of squares estimator of the variance. It has been originally constructed by considering the regression of ordered sample values on corresponding expected normal order statistics. The SW statistic is given by <span class="math display">\[
+\mbox{SW} = \frac{\left(\sum a_{i} x_{(i)} \right)^{2}}{\sum \left(x_{i} - \bar{x} \right)^{2}},
+\]</span> where <span class="math inline">\(x_{(i)}\)</span> are the ordered sample values (<span class="math inline">\(x_{(1)}\)</span> is the smallest) and the <span class="math inline">\(a_{i}\)</span> are constants generated from the means, variances, and covariances of the order statistics of a sample of size <span class="math inline">\(n\)</span> from a normal distribution. The SW statistic lies between 0 and 1. If the SW statistic is close to 1, this indicates the normality of the data. The SW statistic requires the sample size <span class="math inline">\(n\)</span> to be between 7 and 2000.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Example: Dishwasher residuals normality test
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Based on the <span class="math inline">\(p\)</span>-values below, we cannot reject the null hypothesis of normality in both cases.</p>
+<div id="29cbd0b1" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>stat_x, p_x <span class="op">=</span> shapiro(x)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shapiro-Wilk test for simulated data: W = </span><span class="sc">{</span>stat_x<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>p_x<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>stat_resid, p_resid <span class="op">=</span> shapiro(resid1)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shapiro-Wilk test for residuals: W = </span><span class="sc">{</span>stat_resid<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>p_resid<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{'shapiro_x': ShapiroResult(statistic=np.float64(0.9675467536617025), pvalue=np.float64(0.5608570158716737))}
-{'shapiro_resid': ShapiroResult(statistic=np.float64(0.9749991015844385), pvalue=np.float64(0.7542051882335223))}</code></pre>
+<pre><code>Shapiro-Wilk test for simulated data: W = 0.9675, p-value = 0.5609
+Shapiro-Wilk test for residuals: W = 0.9750, p-value = 0.7542</code></pre>
+</div>
+</div>
 </div>
 </div>
 </section>
-<section id="multiple-linear-regression-mlr" class="level2" data-number="2.4">
-<h2 data-number="2.4" class="anchored" data-anchor-id="multiple-linear-regression-mlr"><span class="header-section-number">2.4</span> Multiple linear regression (MLR)</h2>
-<div id="a46487ee" class="cell" data-execution_count="9">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extend to DISH ~ RES + DUR</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>mod2 <span class="op">=</span> smf.ols(<span class="st">"DISH ~ RES + DUR"</span>, data<span class="op">=</span>D).fit()</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mod2.summary())</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>resid2 <span class="op">=</span> mod2.resid</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>fitted2 <span class="op">=</span> mod2.fittedvalues</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">4</span>))</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(D[<span class="st">"Year"</span>], resid2)</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axhline(<span class="dv">0</span>, ls<span class="op">=</span><span class="st">"--"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"Residuals"</span>)</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Residuals vs time"</span>)</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(fitted2, resid2, s<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="dv">0</span>, ls<span class="op">=</span><span class="st">"--"</span>, c<span class="op">=</span><span class="st">"tab:blue"</span>)</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Fitted values"</span>)</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Residuals"</span>)</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Residuals vs fitted"</span>)</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"DW_mod2"</span>: durbin_watson(resid2)})</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"runs_mod2"</span>: runstest_1samp(resid2, correction<span class="op">=</span><span class="va">False</span>)})</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>({<span class="st">"shapiro_mod2"</span>: shapiro(resid2)})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<section id="summary-of-the-simple-linear-regression-residual-diagnostics" class="level3" data-number="1.1.4">
+<h3 data-number="1.1.4" class="anchored" data-anchor-id="summary-of-the-simple-linear-regression-residual-diagnostics"><span class="header-section-number">1.1.4</span> Summary of the simple linear regression residual diagnostics</h3>
+<ol type="1">
+<li>The residuals do not have a constant mean.</li>
+<li>The residuals do not seem to have a constant variance.</li>
+<li>The residuals are positively correlated.</li>
+<li>The residuals look normally distributed (but the SW statistic might be affected by the serial correlation of the residuals).</li>
+</ol>
+</section>
+</section>
+<section id="multiple-linear-regression" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="multiple-linear-regression"><span class="header-section-number">1.2</span> Multiple linear regression</h2>
+<p>Here we consider a case of <span class="math inline">\(p\)</span> explanatory variables <span class="math display">\[
+Y_{t} = \beta_{0} + \beta_{1} X_{t,1} + \dots + \beta_{p} X_{t,p} + \epsilon_{t} \quad (t = 1,\dots,n).
+\]</span></p>
+<p>This can be expressed more compactly in a matrix notation as <span class="math display">\[
+\boldsymbol{Y} = \boldsymbol{X} \boldsymbol{\beta} + \boldsymbol{\epsilon},
+\]</span> where <span class="math inline">\(\boldsymbol{Y} = (Y_{1}, \dots, Y_{n})^{\top}\)</span>, <span class="math inline">\(\boldsymbol{\beta} = (\beta_{0} , \dots, \beta_{p})^{\top}\)</span>, <span class="math inline">\(\boldsymbol{\epsilon} = (\epsilon_{1} , \dots, \epsilon_{n})^{\top}\)</span>; <span class="math inline">\(\boldsymbol{X}\)</span> is an <span class="math inline">\(n \times (p + 1)\)</span> design matrix <span class="math display">\[
+\boldsymbol{X} = \left(
+\begin{array}{cccc}
+1 &amp; X_{1,1} &amp; \dots &amp; X_{1,p} \\
+1 &amp; X_{2,1}&amp; \dots &amp; X_{2,p} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+1 &amp; X_{n,1}&amp; \dots &amp; X_{n,p}
+\end{array}
+\right).
+\]</span></p>
+<p>Here the historical dataset for the dependent variable consists of the observations <span class="math inline">\(Y_{1}, \dots, Y_{n}\)</span>; the historical dataset for the independent variables consists of the observations in the matrix <span class="math inline">\(\boldsymbol{X}\)</span>.</p>
+<p>Minimizing <span class="math inline">\(SSE =(\boldsymbol{Y} - \boldsymbol{X} \hat{\boldsymbol{\beta}})^{\top} (\boldsymbol{Y} - \boldsymbol{X} \hat{\boldsymbol{\beta}})\)</span> yields the least squares solutions <span class="math display">\[
+\hat{\boldsymbol{\beta}} = \left( \boldsymbol{X}^{\top} \boldsymbol{X} \right)^{-1} \boldsymbol{X}^{\top} \boldsymbol{Y}
+\]</span> for non-singular <span class="math inline">\(\boldsymbol{X}^{\top}\boldsymbol{X}\)</span>.</p>
+<p>The forecast of a future value <span class="math inline">\(Y_{t}\)</span> is then given by <span class="math display">\[
+\hat{Y}_{t} = \boldsymbol{x}^{\top}_{t} \hat{\boldsymbol{\beta}},
+\]</span> where <span class="math inline">\(\boldsymbol{x}_{t}\)</span> is a (column) vector at the time <span class="math inline">\(t\)</span>.</p>
+<p>Under the OLS assumptions (recall them), we obtain <span class="math display">\[
+\mathrm{var} \left( \hat{\beta}_{j} \right) = \sigma^{2} \left( \boldsymbol{X }^{\top} \boldsymbol{X} \right)^{-1}_{jj},
+\]</span> where the <span class="math inline">\(\left( \boldsymbol{X}^{\top} \boldsymbol{X} \right)^{-1}_{jj}\)</span> denotes the <span class="math inline">\(j\)</span>th diagonal element of <span class="math inline">\(\left( \boldsymbol{X }^{\top} \boldsymbol{X} \right)^{-1}\)</span>.</p>
+<p>This yields <span class="math display">\[
+s.e. \left( \hat{\beta}_{j} \right) = \hat{\sigma} \sqrt{ \left( \boldsymbol{X }^{\top} \boldsymbol{X} \right)^{-1}_{jj}}.
+\]</span></p>
+<p>Note that here the degrees of freedom (d.f.)&nbsp;are <span class="math inline">\(n - (p + 1) = n - p - 1\)</span>. (The number of estimated parameters for the independent variables is <span class="math inline">\(p\)</span>, plus one for the intercept, i.e., <span class="math inline">\(p + 1\)</span>.)</p>
+<p>Under the OLS assumptions, a <span class="math inline">\(100(1 - \alpha)\)</span>% confidence interval for the parameter <span class="math inline">\(\beta_{j}\)</span> (<span class="math inline">\(j = 0, 1, \dots, p\)</span>) is given by <span id="eq-betaCI"><span class="math display">\[
+\begin{split}
+\hat{\beta}_{j} &amp;\pm t_{\alpha / 2, n - (p+1)} s.e.\left( \hat{\beta}_{j} \right) \text{ or} \\
+\hat{\beta}_{j} &amp;\pm t_{\alpha / 2, n - (p+1)} \hat{\sigma} \sqrt{\left( \boldsymbol{X}^{\top} \boldsymbol{X} \right)^{-1}_{jj}}.
+\end{split}
+\tag{1.2}\]</span></span></p>
+<p>Typically, <span class="math inline">\(s.e.(\hat{\beta}_{j})\)</span> is available directly from the Python output, so <a href="#eq-betaCI" class="quarto-xref">Equation&nbsp;<span>1.2</span></a> is calculated automatically.</p>
+<p>Under the OLS assumptions, it can be shown that <span class="math display">\[
+\mathrm{var} \left( Y_{t} - \hat{Y}_{t} \right) = \sigma^{2} \left( \boldsymbol{x}^{\top}_{t} \left( \boldsymbol{X}^{\top} \boldsymbol{X} \right)^{- 1} \boldsymbol{x}_{t} + 1 \right),
+\]</span> yielding a <span class="math inline">\(100(1 - \alpha)\)</span>% prediction interval for <span class="math inline">\(Y_{t}\)</span>: <span class="math display">\[
+\boldsymbol{x}^{\top}_{t} \hat{\boldsymbol{\beta}} \pm t_{\alpha / 2, n-(p+1)} \hat{\sigma} \sqrt{ \boldsymbol{x}^{\top}_{t} \left( \boldsymbol{X}^{\top} \boldsymbol{X} \right)^{-1}\boldsymbol{x}_{t} + 1}.
+\]</span></p>
+<p>We usually never perform these calculations by hand and will use the corresponding software functions, e.g., using the method <code>get_prediction()</code> in <code>statsmodels</code>, see an example code below.</p>
+<p><strong>What else can we get from the regression output?</strong></p>
+<p>As in SLR, we will look for the <span class="math inline">\(t\)</span>-statistics and <span class="math inline">\(p\)</span>-values to get an idea about the statistical significance of each of the predictors <span class="math inline">\(X_{t,1}, X_{t,2}, \dots, X_{t,p}\)</span>. The confidence intervals constructed above correspond to individual tests of hypothesis about a parameter, i.e., <span class="math inline">\(H_{0}\)</span>: <span class="math inline">\(\beta_{j} = 0\)</span> vs.&nbsp;<span class="math inline">\(H_{1}\)</span>: <span class="math inline">\(\beta_{j} \neq 0\)</span>.</p>
+<p>We can also make use of the <span class="math inline">\(F\)</span>-test. The <span class="math inline">\(F\)</span>-test considers <em>all</em> parameters (other than the intercept <span class="math inline">\(\beta_{0}\)</span>) simultaneously, testing <span class="math display">\[
+\begin{split}
+H_{0}{:} ~ \beta_{1} &amp;= \dots = \beta_{p} = 0 ~~~ \text{vs.} \\
+H_{1}{:} ~ \beta_{j} &amp;\neq 0 ~~~ \mbox{for at least one} ~~~ j \in \{1, \dots, p \}.
+\end{split}
+\]</span></p>
+<p>Formally, <span class="math inline">\(F_{\rm{obs}} = \rm{MSR/MSE}\)</span> (the ratio of the mean square due to regression and the mean square due to stochastic errors).</p>
+<p>We reject <span class="math inline">\(H_{0}\)</span> when <span class="math inline">\(F_{\rm{obs}}\)</span> is too large relative to a cut-off point determined by the degrees of freedom of the <span class="math inline">\(F\)</span>-distribution. The <span class="math inline">\(p\)</span>-value for this <span class="math inline">\(F\)</span>-test is provided in the regression output. Rejecting <span class="math inline">\(H_{0}\)</span> is equivalent to stating that the model has some explanatory value within the range of the data set, meaning that changes in at least some of the explanatory <span class="math inline">\(X\)</span>-variables correlate to changes in the average value of <span class="math inline">\(Y\)</span>.</p>
+<p>Recall that <span class="math display">\[
+\begin{split}
+\mathrm{SST} &amp;= \sum_{i=1}^n(Y_t-\overline{Y})^2= \mathrm{SSR} + \mathrm{SSE},\\
+\mathrm{SSE} &amp;=\sum_{t=1}^n(Y_t-\hat{\beta}_0 - \hat{\beta}_1 X_{t,1}-\dots- \hat{\beta}_p X_{t,p})
+\end{split}
+\]</span> and, hence, <span class="math display">\[
+\rm{SSR}=\rm{SST}-\rm{SSE}.
+\]</span></p>
+<p>To conclude that the model has a reasonable fit, however, we would additionally like to see a high <span class="math inline">\(R^{2}\)</span> value, where <span class="math display">\[
+R^{2} = \rm{SSR/SST}
+\]</span> is the proportion of the total sum of squares explained by the regression.</p>
+<p>Small <span class="math inline">\(R^{2}\)</span> means that the stochastic fluctuations around the regression line (or prediction equation) are large, making the prediction task difficult, even though there may be a genuine explanatory relationship between the average value <span class="math inline">\(\mathrm{E}(Y)\)</span> and some of the <span class="math inline">\(X\)</span>-variables.</p>
+<p>Another criterion to judge the aptness of the obtained model is the adjusted <span class="math inline">\(R^2\)</span>: <span class="math display">\[
+R^2_{adj}=1-\frac{n-1}{n-p}\left( 1-R^2 \right).
+\]</span></p>
+<p>Unlike <span class="math inline">\(R^2\)</span> itself, <span class="math inline">\(R^2_{adj}\)</span> need not increase if an arbitrary (even useless) predictor is added to the model because of the correction <span class="math inline">\((n-1)/(n-p)\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The intercept <span class="math inline">\(\beta_{0}\)</span> is not included in the <span class="math inline">\(F\)</span>-test because there is no explanatory variable associated with it. In other words, <span class="math inline">\(\beta_{0}\)</span> does not contribute to the regression part of the model.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Example: Dishwasher shipments multiple linear regression
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let us now extend the SLR model that we considered previously and include another potential predictor, the durable goods expenditures (billion of 1972 dollars). The goal is to build a model to predict the unit factory shipments of dishwashers (DISH) vs.&nbsp;private residential investment (RES) and durable goods expenditures (DUR) using a multiple linear regression model (MLR): <span class="math display">\[
+Y_{t} = \beta_{0} + \beta_{1} X_{t,1} + \beta_{2} X_{t,2} + \epsilon_t,
+\]</span> where <span class="math inline">\(X_{t,1}\)</span> is the private residential investment <code>RES</code>; <span class="math inline">\(X_{t,2}\)</span> is the durable goods expenditures <code>DUR</code>.</p>
+<p>Now we apply the OLS method to estimate the coefficients <span class="math inline">\(\beta_{0}\)</span>, <span class="math inline">\(\beta_{1}\)</span>, and <span class="math inline">\(\beta_{2}\)</span>.</p>
+<div id="d374c770" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mod2 <span class="op">=</span> smf.ols(<span class="st">"DISH ~ RES + DUR"</span>, data <span class="op">=</span> D).fit()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mod2.summary())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            OLS Regression Results                            
 ==============================================================================
@@ -434,7 +861,7 @@ Dep. Variable:                   DISH   R-squared:                       0.877
 Model:                            OLS   Adj. R-squared:                  0.867
 Method:                 Least Squares   F-statistic:                     82.26
 Date:                Fri, 24 Oct 2025   Prob (F-statistic):           3.31e-11
-Time:                        16:26:40   Log-Likelihood:                -189.63
+Time:                        23:46:05   Log-Likelihood:                -189.63
 No. Observations:                  26   AIC:                             385.3
 Df Residuals:                      23   BIC:                             389.0
 Df Model:                           2                                         
@@ -455,27 +882,122 @@ Kurtosis:                       3.084   Cond. No.                         661.
 Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
 </div>
+</div>
+<p>We have a high <span class="math inline">\(R^2_{adj}\)</span> and both predictors are statistically significant, but can we already wholeheartedly trust these results? We need to perform the residual diagnostics.</p>
+<p>Plot the estimated residuals <span class="math inline">\(\hat{\epsilon}_{t} = \hat{Y}_{t} - Y_{t}\)</span> vs.&nbsp;the observed <span class="math inline">\(Y_{t}\)</span> (<span class="math inline">\(t = 1, 2, \dots, 26\)</span> or <code>Year</code>) – see <a href="#fig-dishresiduals2" class="quarto-xref">Figure&nbsp;<span>1.5</span></a>. The plots show a remaining pattern, with residuals peaking, then declining. The assumption of homoskedasticity is violated. We should update the model so that this pattern is modeled or removed.</p>
+<div id="cell-fig-dishresiduals2" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>resid2 <span class="op">=</span> mod2.resid</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>fitted2 <span class="op">=</span> mod2.fittedvalues</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">4</span>))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs time</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(D[<span class="st">"Year"</span>], resid2, marker <span class="op">=</span> <span class="st">'o'</span>, markersize <span class="op">=</span> <span class="dv">4</span>, linewidth <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].axhline(<span class="dv">0</span>, linestyle <span class="op">=</span> <span class="st">'--'</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">'A'</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Residuals vs fitted</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(fitted2, resid2, s <span class="op">=</span> <span class="dv">20</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].axhline(<span class="dv">0</span>, linestyle <span class="op">=</span> <span class="st">'--'</span>, color <span class="op">=</span> <span class="st">'tab:blue'</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">'Fitted values'</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">'Residuals'</span>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">'B'</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="l01_regression_files/figure-html/cell-10-output-2.png" width="944" height="368" class="figure-img"></p>
+<div id="fig-dishresiduals2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dishresiduals2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="l01_regression_files/figure-html/fig-dishresiduals2-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dishresiduals2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.5: Residuals vs.&nbsp;time and vs.&nbsp;fitted values.
+</figcaption>
 </figure>
 </div>
 </div>
+</div>
+<p>Check that the residuals <span class="math inline">\(\epsilon_{t}\)</span> are uncorrelated (the Durbin–Watson and the runs tests):</p>
+<div id="4e1f91bc" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dw_stat2 <span class="op">=</span> durbin_watson(resid2)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Durbin-Watson statistic: </span><span class="sc">{</span>dw_stat2<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Approximate p-value calculation</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> (dw_stat <span class="op">/</span> <span class="dv">2</span> <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> np.sqrt(<span class="bu">len</span>(resid1))</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>p_value_two_sided <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> norm.sf(np.<span class="bu">abs</span>(z))</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Two-sided p-value: </span><span class="sc">{</span>p_value_two_sided<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{'DW_mod2': np.float64(0.4128009203586526)}
-{'runs_mod2': (np.float64(-2.788637247089075), np.float64(0.005293031474682683))}
-{'shapiro_mod2': ShapiroResult(statistic=np.float64(0.9791592436260312), pvalue=np.float64(0.8556001909507365))}</code></pre>
+<pre><code>Durbin-Watson statistic: 0.4128
+Two-sided p-value: 0.0003</code></pre>
 </div>
 </div>
-<div id="b5397916" class="cell" data-execution_count="10">
+<div id="a7d04141" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>z_resid2, p_resid2 <span class="op">=</span> runstest_1samp(resid2, correction <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Runs test: z = </span><span class="sc">{</span>z_resid2<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>p_resid2<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Runs test: z = -2.7886, p-value = 0.0053</code></pre>
+</div>
+</div>
+<p>Both the tests reject <span class="math inline">\(H_0\)</span> of no autocorrelation; hence the assumption of uncorrelatedness is violated.</p>
+<p>Check that the residuals <span class="math inline">\(\epsilon_{t}\)</span> are normally distributed using the Q-Q plot (<a href="#fig-qq2" class="quarto-xref">Figure&nbsp;<span>1.6</span></a>) and Shapiro–Wilk test.</p>
+<div id="29dc9241" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>stat_resid2, p_resid2_sw <span class="op">=</span> shapiro(resid2)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Shapiro-Wilk test: W = </span><span class="sc">{</span>stat_resid2<span class="sc">:.4f}</span><span class="ss">, p-value = </span><span class="sc">{</span>p_resid2_sw<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shapiro-Wilk test: W = 0.9792, p-value = 0.8556</code></pre>
+</div>
+</div>
+<div id="cell-fig-qq2" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example prediction with intervals (statsmodels: get_prediction + summary_frame)</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>new_data <span class="op">=</span> pd.DataFrame({<span class="st">"RES"</span>: [<span class="fl">100.0</span>], <span class="st">"DUR"</span>: [<span class="fl">150.0</span>]})</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> mod2.get_prediction(new_data)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred.summary_frame(alpha<span class="op">=</span><span class="fl">0.05</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize <span class="op">=</span> (<span class="dv">6</span>, <span class="dv">6</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>pg.qqplot(resid2, dist <span class="op">=</span> <span class="st">'norm'</span>, confidence <span class="op">=</span> <span class="fl">0.95</span>, ax <span class="op">=</span> ax)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Model residuals'</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Standard normal quantiles'</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Sample quantiles'</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div class="cell-output cell-output-display">
+<div id="fig-qq2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-qq2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="l01_regression_files/figure-html/fig-qq2-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-qq2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.6: Normal Q-Q plot of the multiple regression residuals.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-qq2" class="quarto-xref">Figure&nbsp;<span>1.6</span></a> and <span class="math inline">\(p\)</span>-value of the Shapiro–Wilk test do not provide evidence against the null hypothesis of normality. The assumption of normality is satisfied.</p>
+</div>
+</div>
+<section id="summary-of-the-multiple-linear-regression-residual-diagnostics" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="summary-of-the-multiple-linear-regression-residual-diagnostics"><span class="header-section-number">1.2.1</span> Summary of the multiple linear regression residual diagnostics</h3>
+<ol type="1">
+<li>The <span class="math inline">\(R^{2}\)</span> has been improved.</li>
+<li>We do not see a visible improvement in terms of the mean and variance of the residuals.</li>
+<li>The residuals are still positively correlated.</li>
+<li>The residuals look normally distributed.</li>
+</ol>
+<p>Even though not all OLS assumptions are satisfied we shall consider how to predict the future values of <span class="math inline">\(Y\)</span> and to construct the prediction intervals using Python.</p>
+<p>For example, assume that we need to predict the future unit factory shipments of dishwashers (<code>DISH</code>) based on the private residential investment of 100 billion USD and durable goods expenditures of 150 billion USD.</p>
+<p>Supply new values of independent variables and use the method <code>get_prediction()</code>.</p>
+<div id="a9b268fc" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>new_data <span class="op">=</span> pd.DataFrame({<span class="st">"RES"</span>: [<span class="fl">100.0</span>], <span class="st">"DUR"</span>: [<span class="fl">150.0</span>]})</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>pred <span class="op">=</span> mod2.get_prediction(new_data)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred.summary_frame(alpha <span class="op">=</span> <span class="fl">0.05</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>         mean     mean_se  mean_ci_lower  mean_ci_upper  obs_ci_lower  \
 0  5559.30799  521.113009    4481.303598    6637.312381   4227.130196   
@@ -484,9 +1006,115 @@ Notes:
 0   6891.485783  </code></pre>
 </div>
 </div>
-
-
 </section>
+</section>
+<section id="conclusion" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">1.3</span> Conclusion</h2>
+<p>We have recalled the standard assumptions about residuals of linear regression models. Remember that there are some other assumptions (e.g., about linear independence of predictors) that must be verified. Refer to the reading materials for a complete list.</p>
+<p>The methods we have used to test the homogeneity of residuals included various residual plots. The normality of residuals can be assessed using histograms or Q-Q plots and statistical tests such as the Shapiro–Wilk normality test.</p>
+<p>The use of time series in regression presents additional ways to assess patterns in the regression residuals. A plot of residuals vs.&nbsp;time is assessed for homogeneity and absence of trends. Less obvious patterns, such as autocorrelation, can be tested with parametric and nonparametric tests, such as the Durbin–Watson and runs tests.</p>
+<p>The statistical techniques we will learn aim to model or extract as much information from time series (including the autocorrelation of regression residuals) as possible, such that the remaining series are completely random.</p>
+</section>
+<section id="sec-diffsign" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="sec-diffsign"><span class="header-section-number">1.4</span> Appendix</h2>
+<p><strong>Difference sign test</strong></p>
+<p>The logic behind the difference sign test is that in a random process, there will be roughly the same number of ups (positive differences between consecutive values, i.e., <span class="math inline">\(X_t-X_{t-1}\)</span>) and downs (negative differences).</p>
+<p><span class="citation" data-cites="Brockwell:Davis:2002">Brockwell and Davis (<a href="references.html#ref-Brockwell:Davis:2002" role="doc-biblioref">2002</a>)</span>: “The difference-sign test must be used with caution. A set of observations exhibiting a strong cyclic component will pass the difference-sign test for randomness since roughly half of the observations will be points of increase.” We may see (<a href="#fig-dishresiduals" class="quarto-xref">Figure&nbsp;<span>1.2</span></a> and <a href="#fig-dishresiduals2" class="quarto-xref">Figure&nbsp;<span>1.5</span></a>), it is the case for our residuals, even though we have no cyclic component, but have a rise followed by a decline.</p>
+<div id="1f06d060" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> binomtest</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple difference sign test implementation </span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (without normal approximation)</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> difference_sign_test(data, alt <span class="op">=</span> <span class="st">'two-sided'</span>):</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure data is a numpy array for calculations</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    diffs <span class="op">=</span> np.diff(np.asarray(data))</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter out zero differences</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    diffs_no_zero <span class="op">=</span> diffs[diffs <span class="op">!=</span> <span class="dv">0</span>]</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Count positive, negative, and zero differences</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    n_pos <span class="op">=</span> np.<span class="bu">sum</span>(diffs_no_zero <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    n_neg <span class="op">=</span> np.<span class="bu">sum</span>(diffs_no_zero <span class="op">&lt;</span> <span class="dv">0</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    n_zero <span class="op">=</span> <span class="bu">len</span>(diffs) <span class="op">-</span> <span class="bu">len</span>(diffs_no_zero)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    n_total <span class="op">=</span> <span class="bu">len</span>(diffs_no_zero)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle edge case where all differences are zero</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n_total <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Warning: All differences are zero. Test is not applicable."</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"n_positive"</span>: n_pos, </span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>                <span class="st">"n_negative"</span>: n_neg, </span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>                <span class="st">"n_zero"</span>: n_zero, </span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>                <span class="st">"n_total"</span>: n_total, </span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                <span class="st">"p_value"</span>: np.nan}</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Under H0, proportion of positive should be ~0.5</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Test is performed on the non-zero count</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> binomtest(n_pos, n_total, <span class="fl">0.5</span>, alternative <span class="op">=</span> alt)</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Return a dictionary of results</span></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_positive"</span>: n_pos,</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_negative"</span>: n_neg,</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_zero"</span>: n_zero,</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">"n_total"</span>: n_total,</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>        <span class="st">"p_value"</span>: result.pvalue</span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Results for simulated values.</p>
+<div id="c3913d16" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>difference_sign_test(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>{'n_positive': 12,
+ 'n_negative': 13,
+ 'n_zero': 0,
+ 'n_total': 25,
+ 'p_value': 1.0}</code></pre>
+</div>
+</div>
+<p>For simple linear regression residuals.</p>
+<div id="96f0de05" class="cell" data-execution_count="18">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>difference_sign_test(resid1.values)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>{'n_positive': 13,
+ 'n_negative': 12,
+ 'n_zero': 0,
+ 'n_total': 25,
+ 'p_value': 1.0}</code></pre>
+</div>
+</div>
+<p>For multiple linear regression residuals.</p>
+<div id="bbe40e99" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>difference_sign_test(resid2.values)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>{'n_positive': 12,
+ 'n_negative': 13,
+ 'n_zero': 0,
+ 'n_total': 25,
+ 'p_value': 1.0}</code></pre>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-Brockwell:Davis:2002" class="csl-entry" role="listitem">
+Brockwell PJ, Davis RA (2002) Introduction to time series and forecasting, 2nd edn. Springer, New York, NY, USA
+</div>
+<div id="ref-Chatterjee:Hadi:2006" class="csl-entry" role="listitem">
+Chatterjee S, Hadi AS (2006) Regression analysis by example, 4th edn. John Wiley &amp; Sons, Hoboken, NJ, USA
+</div>
+<div id="ref-Chatterjee:Simonoff:2013" class="csl-entry" role="listitem">
+Chatterjee S, Simonoff JS (2013) Handbook of regression analysis. John Wiley &amp; Sons, Hoboken, NJ, USA
+</div>
+</div>
 </section>
 
 </main> <!-- /main -->
@@ -890,7 +1518,7 @@ Notes:
     }
   });
   </script>
-<nav class="page-navigation">
+<nav class="page-navigation column-body">
   <div class="nav-page nav-page-previous">
       <a href="./index.html" class="pagination-link" aria-label="Preface">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Preface</span>

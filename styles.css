@@ -1,0 +1,31 @@
+/* Increase the maximum content width for better accommodation of wide figures */
+:root {
+  /* Default is around 940px; bump to reduce risk of horizontal scrolling */
+  --content-max-width: 1200px;
+}
+
+/* Ensure Jupyter-generated outputs and figures are responsive */
+.cell-output-display img,
+.cell-output-display svg,
+.quarto-figure img,
+.quarto-figure svg,
+figure img,
+figure svg,
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Optional: prevent horizontal scroll inside figure containers */
+.quarto-figure, figure {
+  overflow-x: hidden;
+}
+
+/* Optional: if callouts or sidebars contain figures, keep them constrained */
+.callout img,
+.callout svg,
+.sidebar img,
+.sidebar svg {
+  max-width: 100%;
+  height: auto;
+}

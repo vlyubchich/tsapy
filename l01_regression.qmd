@@ -1,15 +1,20 @@
----
-output: html_document
-editor_options: 
-    chunk_output_type: console
----
+```{python}
+#| echo: false
 
-```{r, echo=FALSE}
-library(dplyr)
-library(ggplot2)
-library(patchwork)
-options(digits = 3)
-theme_set(theme_light())
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from statsmodels.stats.stattools import durbin_watson
+from statsmodels.sandbox.stats.runs import runstest_1samp
+from scipy.stats import shapiro, norm
+import pingouin as pg
+
+sns.set_theme(style = "whitegrid")
+np.set_printoptions(precision = 3)
+np.random.seed(1)
 ```
 
 # Review of Linear Regression {#sec-regression}
@@ -76,17 +81,22 @@ We plot the residuals $\hat{\epsilon}_{t}$ vs. time, fitted values $\hat{Y}_{t}$
 If the assumption of constant variance is satisfied, $\hat{\epsilon}_{t}$ fluctuate around the zero mean with more or less constant amplitude and this amplitude does not change with time, fitted values $\hat{Y}_{t}$, and predictor values $X_t$.
 
 If the (linear) model is not appropriate, the mean of the residuals may be non-constant, i.e., not always 0. 
-@fig-IdealResiduals shows an example of a random pattern that we would like the residuals to have (no systematic patterns).
+@fig-idealresiduals shows an example of a random pattern that we would like the residuals to have (no systematic patterns).
 
-```{r}
-#| label: fig-IdealResiduals
+```{python}
+#| label: fig-idealresiduals
 #| fig-cap: "A time series plot of 'ideal' residuals. These residuals $x_t$ are simulated i.i.d. normal."
 
-set.seed(1)
-n = 26; m = 0; s = 522
-x <- ts(rnorm(n, mean = m, sd = s))
-forecast::autoplot(x) + 
-    geom_hline(yintercept = 0, lty = 2, col = 4)
+n, m, s = 26, 0.0, 522.0
+x = np.random.normal(loc = m, scale = s, size = n)
+
+fig, ax = plt.subplots(figsize = (8, 5))
+ax.plot(x, marker = 'o', markersize = 4, linewidth = 1)
+ax.axhline(0, linestyle = '--', color = 'tab:blue')
+ax.set_xlabel('Time')
+ax.set_ylabel('Residuals')
+plt.tight_layout()
+plt.show()
 ```
 
 What can we notice in a residual plot?
@@ -105,39 +115,53 @@ Similarly to their time series plot, $\hat{\epsilon}_{t}$ should fluctuate aroun
 
 ## Example: Dishwasher shipments model and patterns in residuals
 
-@fig-DishResiduals shows the R code and residuals of a simple linear regression exploring dishwasher shipments (DISH) and private residential investments (RES) for several years.
+@fig-dishresiduals shows the Python code and residuals of a simple linear regression exploring dishwasher shipments (DISH) and private residential investments (RES) for several years.
 
-How different are the patterns in @fig-DishResiduals from those in @fig-IdealResiduals?
+How different are the patterns in @fig-dishresiduals from those in @fig-idealresiduals?
 
-```{r}
-#| label: fig-DishResiduals
+```{python}
+#| label: fig-dishresiduals
 #| fig-cap: "Estimated residuals plotted vs. time, fitted values, and predictor."
 #| fig-height: 3
 
-D <- read.delim("data/dish.txt") %>% 
-    rename(Year = YEAR)
-mod1 <- lm(DISH ~ RES, data = D)
-p1 <- ggplot(D, aes(x = Year, y = mod1$residuals)) + 
-    geom_line() + 
-    geom_hline(yintercept = 0, lty = 2, col = 4) + 
-    ylab("Residuals")
-p2 <- ggplot(D, aes(x = mod1$fitted.values, y = mod1$residuals)) + 
-    geom_point() + 
-    geom_hline(yintercept = 0, lty = 2, col = 4) + 
-    xlab("Fitted values") +
-    ylab("Residuals")
-p3 <- ggplot(D, aes(x = RES, y = mod1$residuals)) + 
-    geom_point() + 
-    geom_hline(yintercept = 0, lty = 2, col = 4) + 
-    xlab("Residential investments (RES)") +
-    ylab("Residuals")
-p1 + p2 + p3 +
-    plot_annotation(tag_levels = 'A')
+D = pd.read_csv("data/dish.txt", sep = "\t")
+if "YEAR" in D.columns:
+    D = D.rename(columns = {"YEAR": "Year"})
+
+mod1 = smf.ols("DISH ~ RES", data = D).fit()
+resid1 = mod1.resid
+fitted1 = mod1.fittedvalues
+
+fig, axes = plt.subplots(1, 3, figsize = (12, 3))
+
+# Residuals vs time
+axes[0].plot(D["Year"], resid1, marker = 'o', markersize = 4, linewidth = 1)
+axes[0].axhline(0, linestyle = '--', color = 'tab:blue')
+axes[0].set_xlabel('Year')
+axes[0].set_ylabel('Residuals')
+axes[0].set_title('A')
+
+# Residuals vs fitted
+axes[1].scatter(fitted1, resid1, s = 20)
+axes[1].axhline(0, linestyle = '--', color = 'tab:blue')
+axes[1].set_xlabel('Fitted values')
+axes[1].set_ylabel('Residuals')
+axes[1].set_title('B')
+
+# Residuals vs predictor
+axes[2].scatter(D["RES"], resid1, s = 20)
+axes[2].axhline(0, linestyle = '--', color = 'tab:blue')
+axes[2].set_xlabel('Residential investments (RES)')
+axes[2].set_ylabel('Residuals')
+axes[2].set_title('C')
+
+plt.tight_layout()
+plt.show()
 ```
 
-In @fig-DishResiduals, we see a pattern of residuals increasing in time, and a pattern of lower variability for high fitted values or high residential investments.
+In @fig-dishresiduals, we see a pattern of residuals increasing in time, and a pattern of lower variability for high fitted values or high residential investments.
 Thus, the assumption of homoskedasticity is violated.
-In @fig-IdealResiduals, no such patterns are observed.
+In @fig-idealresiduals, no such patterns are observed.
 :::
 
 
@@ -224,12 +248,19 @@ Statistical software packages usually provide exact $p$-values based on the null
 
 ## Example: Dishwasher residuals DW test
 
-Apply the Durbin--Watson test to the residuals from the dishwashers example, i.e., `DISH` vs. `RES`, using the R package `lmtest`.
+Apply the Durbin--Watson test to the residuals from the dishwashers example, i.e., `DISH` vs. `RES`, using the Python package `statsmodels`.
 
-```{r}
+```{python}
 #| code-fold: false
 
-lmtest::dwtest(D$DISH ~ D$RES, alternative = "greater")
+dw_stat = durbin_watson(resid1)
+print(f"Durbin-Watson statistic: {dw_stat:.4f}")
+
+# Approximate p-value calculation
+z = (dw_stat / 2 - 1) * np.sqrt(len(resid1))
+p_value_two_sided = 2 * norm.sf(np.abs(z))
+
+print(f"Two-sided p-value: {p_value_two_sided:.4f}")
 ```
 
 Based on the low $p$-value we can reject the $H_{0}$: $\rho = 0$ at the 95% confidence level and accept the alternative $H_{1}$: $\rho > 0$.
@@ -274,25 +305,19 @@ Runs test allows assessing only the first-order serial correlation in the residu
 
 ## Example: Dishwasher residuals runs test
 
-```{r}
-#| label: fig-Runs
-#| fig-cap: "Runs tests and plots of independent normally distributed simulations $x_t$ and the `DISH` residuals."
+```{python}
 #| code-fold: false
 
-par(mfrow = c(1, 2))
-lawstat::runs.test(x, plot.it = TRUE)
-lawstat::runs.test(mod1$residuals, plot.it = TRUE)
+# Runs test for simulated data
+z_x, p_x = runstest_1samp(x, correction = False)
+print(f"Runs test for simulated data: z = {z_x:.4f}, p-value = {p_x:.4f}")
+
+# Runs test for residuals
+z_resid, p_resid = runstest_1samp(resid1, correction = False)
+print(f"Runs test for residuals: z = {z_resid:.4f}, p-value = {p_resid:.4f}")
 ```
 
-The $p$-value for the runs test for the residuals is very low (@fig-Runs), which supports the findings of the DW test that residuals are first-order serially correlated.
-
-Alternative versions of the runs test are available, e.g., in the package `randtests`.
-
-```{r}
-#| code-fold: false
-
-randtests::runs.test(mod1$residuals)
-```
+The $p$-value for the runs test for the residuals is very low, which supports the findings of the DW test that residuals are first-order serially correlated.
 :::
 
 
@@ -306,28 +331,32 @@ Numerical methods conduct statistical tests on the null hypothesis that the vari
 **Graphical methods**
 
 Graphical methods visualize the data using graphs, such as histograms, stem-and-leaf plots, box plots, etc. 
-For example, @fig-Histograms shows a histogram of the simulated normally distributed data and the residuals from the dishwasher example with superimposed normal curves with the corresponding mean and standard deviation.
+For example, @fig-histograms shows a histogram of the simulated normally distributed data and the residuals from the dishwasher example with superimposed normal curves with the corresponding mean and standard deviation.
 
-```{r}
-#| label: fig-Histograms
+```{python}
+#| label: fig-histograms
 #| fig-cap: "Histograms of the simulated normally distributed values and estimated regression residuals."
 
-p1 <- ggplot(data.frame(x = x), aes(x = x)) + 
-    geom_histogram(aes(y = after_stat(density)), binwidth = 300, fill = "grey50") +
-    stat_function(fun = dnorm, 
-                  args = list(mean = mean(x), sd = sd(x)),
-                  col = 1, lwd = 1.5) +
-    ylab("Density") +
-    ggtitle("Random normal values")
-p2 <- ggplot(x, aes(x = mod1$residuals)) + 
-    geom_histogram(aes(y = after_stat(density)), binwidth = 300, fill = "grey50") +
-    stat_function(fun = dnorm, 
-                  args = list(mean = mean(mod1$residuals), sd = sd(mod1$residuals)),
-                  col = 1, lwd = 1.5) +
-    ylab("Density") +
-    ggtitle("Model residuals")
-p1 + p2 +
-    plot_annotation(tag_levels = 'A')
+fig, axes = plt.subplots(1, 2, figsize = (10, 4))
+
+# Histogram for simulated normal values
+axes[0].hist(x, bins = 10, density = True, color = 'grey', alpha = 0.7, edgecolor = 'black')
+x_range = np.linspace(x.min(), x.max(), 100)
+axes[0].plot(x_range, norm.pdf(x_range, loc = np.mean(x), scale = np.std(x, ddof = 1)), 
+             color = 'black', linewidth = 2)
+axes[0].set_ylabel('Density')
+axes[0].set_title('Random normal values')
+
+# Histogram for residuals
+axes[1].hist(resid1, bins = 10, density = True, color = 'grey', alpha = 0.7, edgecolor = 'black')
+resid_range = np.linspace(resid1.min(), resid1.max(), 100)
+axes[1].plot(resid_range, norm.pdf(resid_range, loc = np.mean(resid1), scale = np.std(resid1, ddof = 1)), 
+             color = 'black', linewidth = 2)
+axes[1].set_ylabel('Density')
+axes[1].set_title('Model residuals')
+
+plt.tight_layout()
+plt.show()
 ```
 
 Another very popular graphical method of assessing normality is the quantile-quantile (Q-Q) plot. 
@@ -350,7 +379,7 @@ Then we will call $x_{(\alpha)}$ the $\alpha$th *(population) quantile* of $X$.
 Note that any normal distribution has this uniqueness property. 
 If we consider a standard normal $Z \sim N(0, 1)$, then some well-known quantiles are:
 
-* $z_{(0.5)} = 0$ (the median), `qnorm(0.5, mean = 0, sd = 1)`
+* $z_{(0.5)} = 0$ (the median),
 * $z_{(0.05)} = -1.645$ and $z_{(0.95)} = 1.645$
 * $z_{(0.025)} = -1.96$ and $z_{(0.975)} = 1.96$
 
@@ -388,31 +417,37 @@ Note that the proportion of observations less than or equal to $X_{(k/n)}$ is ex
 Hence $X_{(k/n)}$, called the $k$th *sample quantile*, is an estimate of the population quantile $x_{(k/n)}$.
 
 The normal Q-Q plot is obtained by plotting the sample quantiles vs. the quantiles of the standard normal distribution. 
-The base-R function `qqnorm()` produces a normal Q-Q plot of data and the function `qqline()` adds a line that passes through the first and third quartiles. 
-The R package `ggplot2` has analogous functions `ggplot2::stat_qq()` and `ggplot2::stat_qq_line()`. 
-The R packages `car` and `ggpubr` also draw Q-Q plots, but also add a point-wise confidence envelope with their functions `car::qqPlot()` (base-R plot) and `ggpubr::ggqqplot()` (ggplot-type plot). 
+Python's `statsmodels` library provides functions to create Q-Q plots with confidence bands.
 
 ::: {.callout-note icon=false}
 
 ## Example: Dishwasher residuals normal Q-Q plot
 
-@fig-QQ shows the Q-Q plots of the residuals from the dishwasher example and the simulated normal data with the same mean and standard deviation.
+@fig-qq shows the Q-Q plots of the residuals from the dishwasher example and the simulated normal data with the same mean and standard deviation.
 
-```{r}
-#| label: fig-QQ
+```{python}
+#| label: fig-qq
 #| fig-cap: "Normal Q-Q plots of the normally distributed simulated values $x_t$ and the dishwasher residuals."
 
-p1 <- ggpubr::ggqqplot(x) + 
-    ggtitle("Random normal values") +
-    xlab("Standard normal quantiles")
-p2 <- ggpubr::ggqqplot(mod1$residuals) + 
-    ggtitle("Model residuals") +
-    xlab("Standard normal quantiles")
-p1 + p2 +
-    plot_annotation(tag_levels = 'A')
+fig, axes = plt.subplots(1, 2, figsize = (10, 4))
+
+# Q-Q plot for simulated normal values
+pg.qqplot(x, dist = 'norm', confidence = 0.95, ax = axes[0])
+axes[0].set_title('Random normal values')
+axes[0].set_xlabel('Standard normal quantiles')
+axes[0].set_ylabel('Sample quantiles')
+
+# Q-Q plot for residuals
+pg.qqplot(resid1, dist = 'norm', confidence = 0.95, ax = axes[1])
+axes[1].set_title('Model residuals')
+axes[1].set_xlabel('Standard normal quantiles')
+axes[1].set_ylabel('Sample quantiles')
+
+plt.tight_layout()
+plt.show()
 ```
 
-Both Q-Q plots in @fig-QQ show a good correspondence of the sample quantiles with theoretical normal quantiles, providing no sufficient evidence against normality of the underlying distributions.
+Both Q-Q plots in @fig-qq show a good correspondence of the sample quantiles with theoretical normal quantiles, providing no sufficient evidence against normality of the underlying distributions.
 :::
 
 Although visually appealing, these graphical methods do not provide objective criteria to determine the normality of variables.
@@ -441,11 +476,14 @@ The SW statistic requires the sample size $n$ to be between 7 and 2000.
 
 Based on the $p$-values below, we cannot reject the null hypothesis of normality in both cases.
 
-```{r}
+```{python}
 #| code-fold: false
 
-shapiro.test(x)
-shapiro.test(mod1$residuals)
+stat_x, p_x = shapiro(x)
+print(f"Shapiro-Wilk test for simulated data: W = {stat_x:.4f}, p-value = {p_x:.4f}")
+
+stat_resid, p_resid = shapiro(resid1)
+print(f"Shapiro-Wilk test for residuals: W = {stat_resid:.4f}, p-value = {p_resid:.4f}")
 ```
 :::
 
@@ -517,7 +555,7 @@ $$
 \end{split}
 $${#eq-betaCI}
 
-Typically, $s.e.(\hat{\beta}_{j})$ is available directly from the R output, so @eq-betaCI is calculated automatically.
+Typically, $s.e.(\hat{\beta}_{j})$ is available directly from the Python output, so @eq-betaCI is calculated automatically.
 
 Under the OLS assumptions, it can be shown that
 $$
@@ -528,7 +566,7 @@ $$
 \boldsymbol{x}^{\top}_{t} \hat{\boldsymbol{\beta}} \pm t_{\alpha / 2, n-(p+1)} \hat{\sigma} \sqrt{ \boldsymbol{x}^{\top}_{t} \left( \boldsymbol{X}^{\top} \boldsymbol{X} \right)^{-1}\boldsymbol{x}_{t} + 1}.
 $$
 
-We usually never perform these calculations by hand and will use the corresponding software functions, e.g., using the function `predict()`, see an example code below.
+We usually never perform these calculations by hand and will use the corresponding software functions, e.g., using the method `get_prediction()` in `statsmodels`, see an example code below.
 
 **What else can we get from the regression output?**
 
@@ -547,7 +585,7 @@ $$
 Formally, $F_{\rm{obs}} = \rm{MSR/MSE}$ (the ratio of the mean square due to regression and the mean square due to stochastic errors).
 
 We reject $H_{0}$ when $F_{\rm{obs}}$ is too large relative to a cut-off point determined by the degrees of freedom of the $F$-distribution. 
-The $p$-value for this $F$-test is provided in the `lm()` output. 
+The $p$-value for this $F$-test is provided in the regression output. 
 Rejecting $H_{0}$ is equivalent to stating that the model has some explanatory value within the range of the data set, meaning that changes in at least some of the explanatory $X$-variables correlate to changes in the average value of $Y$.
 
 Recall that
@@ -593,73 +631,99 @@ Y_{t} = \beta_{0} + \beta_{1} X_{t,1} + \beta_{2} X_{t,2} + \epsilon_t,
 $$
 where $X_{t,1}$ is the private residential investment `RES`; $X_{t,2}$ is the durable goods expenditures `DUR`.
 
-Now we apply the OLS method to estimate the coefficients $\beta_{0}$, $\beta_{1}$, and $\beta_{2}$ using the function `lm()`.
+Now we apply the OLS method to estimate the coefficients $\beta_{0}$, $\beta_{1}$, and $\beta_{2}$.
 
-```{r}
+```{python}
 #| code-fold: false
 
-mod2 <- lm(DISH ~ RES + DUR, data = D)
-summary(mod2)
+mod2 = smf.ols("DISH ~ RES + DUR", data = D).fit()
+print(mod2.summary())
 ```
 
-We have a high $R^2_{adj} =$ `r summary(mod2)$adj.r.squared` and both predictors are statistically significant, but can we already wholeheartedly trust these results? 
+We have a high $R^2_{adj}$ and both predictors are statistically significant, but can we already wholeheartedly trust these results? 
 We need to perform the residual diagnostics.
 
-Plot the estimated residuals $\hat{\epsilon}_{t} = \hat{Y}_{t} - Y_{t}$ vs. the observed $Y_{t}$ ($t = 1, 2, \dots, 26$ or `Year`) -- see @fig-DishResiduals2.
+Plot the estimated residuals $\hat{\epsilon}_{t} = \hat{Y}_{t} - Y_{t}$ vs. the observed $Y_{t}$ ($t = 1, 2, \dots, 26$ or `Year`) -- see @fig-dishresiduals2.
 The plots show a remaining pattern, with residuals peaking, then declining.
 The assumption of homoskedasticity is violated.
 We should update the model so that this pattern is modeled or removed.
 
-```{r}
-#| label: fig-DishResiduals2
+```{python}
+#| label: fig-dishresiduals2
 #| fig-cap: "Residuals vs. time and vs. fitted values."
 
-p1 <- ggplot(D, aes(x = Year, y = mod2$residuals)) + 
-    geom_line() + 
-    geom_hline(yintercept = 0, lty = 2, col = 4) + 
-    ylab("Residuals")
-p2 <- ggplot(D, aes(x = mod2$fitted.values, y = mod2$residuals)) + 
-    geom_point() + 
-    geom_hline(yintercept = 0, lty = 2, col = 4) + 
-    xlab("Fitted values") +
-    ylab("Residuals")
-p1 + p2 +
-    plot_annotation(tag_levels = 'A')
+resid2 = mod2.resid
+fitted2 = mod2.fittedvalues
+
+fig, axes = plt.subplots(1, 2, figsize = (10, 4))
+
+# Residuals vs time
+axes[0].plot(D["Year"], resid2, marker = 'o', markersize = 4, linewidth = 1)
+axes[0].axhline(0, linestyle = '--', color = 'tab:blue')
+axes[0].set_xlabel('Year')
+axes[0].set_ylabel('Residuals')
+axes[0].set_title('A')
+
+# Residuals vs fitted
+axes[1].scatter(fitted2, resid2, s = 20)
+axes[1].axhline(0, linestyle = '--', color = 'tab:blue')
+axes[1].set_xlabel('Fitted values')
+axes[1].set_ylabel('Residuals')
+axes[1].set_title('B')
+
+plt.tight_layout()
+plt.show()
 ```
 
 Check that the residuals $\epsilon_{t}$ are uncorrelated (the Durbin--Watson and the runs tests):
 
-```{r}
+```{python}
 #| code-fold: false
 
-lmtest::dwtest(D$DISH ~ D$RES + D$DUR)
+dw_stat2 = durbin_watson(resid2)
+print(f"Durbin-Watson statistic: {dw_stat2:.4f}")
+
+# Approximate p-value calculation
+z = (dw_stat / 2 - 1) * np.sqrt(len(resid1))
+p_value_two_sided = 2 * norm.sf(np.abs(z))
+
+print(f"Two-sided p-value: {p_value_two_sided:.4f}")
 ```
 
-```{r}
+```{python}
 #| code-fold: false
 
-lawstat::runs.test(mod2$residuals, plot.it = FALSE)
+z_resid2, p_resid2 = runstest_1samp(resid2, correction = False)
+print(f"Runs test: z = {z_resid2:.4f}, p-value = {p_resid2:.4f}")
 ```
 
 Both the tests reject $H_0$ of no autocorrelation; hence the assumption of uncorrelatedness is violated.
 
-Check that the residuals $\epsilon_{t}$ are normally distributed using the Q-Q plot (@fig-QQ2) and Shapiro--Wilk test.
+Check that the residuals $\epsilon_{t}$ are normally distributed using the Q-Q plot (@fig-qq2) and Shapiro--Wilk test.
 
-```{r}
+```{python}
 #| code-fold: false
 
-shapiro.test(mod2$residuals)
+stat_resid2, p_resid2_sw = shapiro(resid2)
+print(f"Shapiro-Wilk test: W = {stat_resid2:.4f}, p-value = {p_resid2_sw:.4f}")
 ```
 
-```{r}
-#| label: fig-QQ2
+```{python}
+#| label: fig-qq2
 #| fig-cap: "Normal Q-Q plot of the multiple regression residuals."
 
-ggpubr::ggqqplot(mod2$residuals) + 
-    xlab("Standard normal quantiles")
+fig, ax = plt.subplots(figsize = (6, 6))
+
+pg.qqplot(resid2, dist = 'norm', confidence = 0.95, ax = ax)
+ax.set_title('Model residuals')
+ax.set_xlabel('Standard normal quantiles')
+ax.set_ylabel('Sample quantiles')
+
+plt.tight_layout()
+plt.show()
 ```
 
-@fig-QQ2 and $p$-value of the Shapiro--Wilk test do not provide evidence against the null hypothesis of normality.
+@fig-qq2 and $p$-value of the Shapiro--Wilk test do not provide evidence against the null hypothesis of normality.
 The assumption of normality is satisfied.
 :::
 
@@ -671,17 +735,18 @@ The assumption of normality is satisfied.
 1. The residuals are still positively correlated.
 1. The residuals look normally distributed.
 
-Even though not all OLS assumptions are satisfied we shall consider how to predict the future values of $Y$ and to construct the prediction intervals using R.
+Even though not all OLS assumptions are satisfied we shall consider how to predict the future values of $Y$ and to construct the prediction intervals using Python.
 
 For example, assume that we need to predict the future unit factory shipments of dishwashers (`DISH`) based on the private residential investment of 100 billion USD and durable goods expenditures of 150 billion USD.
 
-Supply new values of independent variables and use the function `predict()`.
+Supply new values of independent variables and use the method `get_prediction()`.
 
-```{r}
+```{python}
 #| code-fold: false
 
-newData <- data.frame(RES = c(100), DUR = c(150))
-predict(mod2, newData, se.fit = TRUE, interval = "prediction")
+new_data = pd.DataFrame({"RES": [100.0], "DUR": [150.0]})
+pred = mod2.get_prediction(new_data)
+print(pred.summary_frame(alpha = 0.05))
 ```
 
 
@@ -708,12 +773,62 @@ The statistical techniques we will learn aim to model or extract as much informa
 The logic behind the difference sign test is that in a random process, there will be roughly the same number of ups (positive differences between consecutive values, i.e., $X_t-X_{t-1}$) and downs (negative differences).
 
 @Brockwell:Davis:2002: "The difference-sign test must be used with caution. A set of observations exhibiting a strong cyclic component will pass the difference-sign test for randomness since roughly half of the observations will be points of increase." 
-We may see (@fig-DishResiduals and @fig-DishResiduals2), it is the case for our residuals, even though we have no cyclic component, but have a rise followed by a decline.
+We may see (@fig-dishresiduals and @fig-dishresiduals2), it is the case for our residuals, even though we have no cyclic component, but have a rise followed by a decline.
 
-```{r}
+```{python}
 #| code-fold: false
 
-randtests::difference.sign.test(x)
-randtests::difference.sign.test(mod1$residuals)
-randtests::difference.sign.test(mod2$residuals)
+from scipy.stats import binomtest
+
+# Simple difference sign test implementation 
+# (without normal approximation)
+def difference_sign_test(data, alt = 'two-sided'):
+# Ensure data is a numpy array for calculations
+    diffs = np.diff(np.asarray(data))
+    
+    # Filter out zero differences
+    diffs_no_zero = diffs[diffs != 0]
+    
+    # Count positive, negative, and zero differences
+    n_pos = np.sum(diffs_no_zero > 0)
+    n_neg = np.sum(diffs_no_zero < 0)
+    n_zero = len(diffs) - len(diffs_no_zero)
+    n_total = len(diffs_no_zero)
+    
+    # Handle edge case where all differences are zero
+    if n_total == 0:
+        print("Warning: All differences are zero. Test is not applicable.")
+        return {"n_positive": n_pos, 
+                "n_negative": n_neg, 
+                "n_zero": n_zero, 
+                "n_total": n_total, 
+                "p_value": np.nan}
+
+    # Under H0, proportion of positive should be ~0.5
+    # Test is performed on the non-zero count
+    result = binomtest(n_pos, n_total, 0.5, alternative = alt)
+    
+    # Return a dictionary of results
+    return {
+        "n_positive": n_pos,
+        "n_negative": n_neg,
+        "n_zero": n_zero,
+        "n_total": n_total,
+        "p_value": result.pvalue
+    }
+```
+
+Results for simulated values.
+```{python}
+difference_sign_test(x)
+```
+
+For simple linear regression residuals.
+```{python}
+difference_sign_test(resid1.values)
+```
+
+For multiple linear regression residuals.
+```{python}
+difference_sign_test(resid2.values)
 ```

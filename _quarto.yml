@@ -54,6 +54,9 @@ format:
         code-fold: true
         code-link: true
         theme: cosmo
+        page-layout: full
+        css: styles.css
+        fig-format: svg
         fig-width: 8
         fig-height: 5
 
