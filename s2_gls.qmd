@@ -1,15 +1,17 @@
----
-output: html_document
-editor_options:
-    chunk_output_type: console
----
+```{python}
+#| echo: false
 
-```{r, echo=FALSE}
-library(dplyr)
-library(ggplot2)
-library(patchwork)
-options(digits = 3)
-theme_set(theme_light())
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from statsmodels.sandbox.stats.runs import runstest_1samp
+from statsmodels.regression.linear_model import GLSAR
+
+sns.set_theme(style = "whitegrid")
+np.set_printoptions(precision = 3)
 ```
 
 # Generalized least squares {#sec-gls}
@@ -52,56 +54,76 @@ To get from @eq-mod1t to @eq-mod1w, we can use an iterative procedure by @Cochra
 ## Example: Dishwasher shipments model accounting for autocorrelation
 
 1. Estimate the model in @eq-mod1t using OLS.
-```{r}
-D <- read.delim("data/dish.txt") %>% 
-    rename(Year = YEAR)
-modDish_ols <- lm(DISH ~ RES, data = D)
+
+```{python}
+#| code-fold: false
+
+D = pd.read_csv("data/dish.txt", sep = "\t")
+if "YEAR" in D.columns:
+    D = D.rename(columns = {"YEAR": "Year"})
+modDish_ols = smf.ols("DISH ~ RES", data = D).fit()
 ```
 
 2. Calculate residuals $\hat{\varepsilon}_t$ and estimate $\rho$ as
 $$
 \hat{\rho}=\frac{\sum_{t=2}^n\hat{\varepsilon}_t\hat{\varepsilon}_{t-1}}{\sum_{t=1}^n\hat{\varepsilon}^2_t}.
 $$
-```{r}
-e <- modDish_ols$residuals
-rho <- sum(e[-1] * e[-length(e)]) / sum(e^2)
-rho
+
+```{python}
+#| code-fold: false
+
+e = modDish_ols.resid.values
+rho = np.sum(e[1:] * e[:-1]) / np.sum(e ** 2)
+print(f"Estimated rho: {rho:.4f}")
 ```
 
 3. Calculate transformed variables $x^*_t$ and $y^*_t$ and fit model in @eq-mod1w.
-```{r}
-y.star <- D$DISH[-1] - rho * D$DISH[-length(D$DISH)]
-x.star <- D$RES[-1] - rho * D$RES[-length(D$RES)]
-modDish_ar1 <- lm(y.star ~ x.star)
-summary(modDish_ar1)
+
+```{python}
+#| code-fold: false
+
+y_star = D["DISH"].iloc[1:].values - rho * D["DISH"].iloc[:-1].values
+x_star = D["RES"].iloc[1:].values - rho * D["RES"].iloc[:-1].values
+
+D_star = pd.DataFrame({"y_star": y_star, "x_star": x_star})
+modDish_ar1 = smf.ols("y_star ~ x_star", data = D_star).fit()
+print(modDish_ar1.summary())
 ```
 
-4. Examine the residuals of the newly fitted equation (@fig-dishAR1) and repeat the procedure, if needed.
+4. Examine the residuals of the newly fitted equation (@fig-dishar1) and repeat the procedure, if needed.
 
-```{r}
-#| label: fig-dishAR1
+```{python}
+#| label: fig-dishar1
 #| fig-cap: "Residual plots of the original OLS model and the model transformed to account for autocorrelation in residuals."
 
-p1 <- ggplot(D, aes(x = Year, y = modDish_ols$residuals)) + 
-    geom_line() + 
-    geom_hline(yintercept = 0, lty = 2, col = 4) + 
-    ggtitle("OLS model modDish_ols") +
-    ylab("Residuals")
-p2 <- ggplot(D[-1,], aes(x = Year, y = modDish_ar1$residuals)) + 
-    geom_line() + 
-    geom_hline(yintercept = 0, lty = 2, col = 4) + 
-    ggtitle("Transformed model modDish_ar1") +
-    ylab("Residuals")
-p1 + p2 +
-    plot_annotation(tag_levels = 'A')
+fig, axes = plt.subplots(1, 2, figsize = (12, 4))
+
+# A: OLS residuals
+axes[0].plot(D["Year"], modDish_ols.resid, marker = "o", markersize = 4)
+axes[0].axhline(0, linestyle = "--", color = "tab:blue", linewidth = 1)
+axes[0].set_xlabel("Year")
+axes[0].set_ylabel("Residuals")
+axes[0].set_title("A: OLS model modDish_ols")
+
+# B: Transformed model residuals
+axes[1].plot(D["Year"].iloc[1:].values, modDish_ar1.resid, marker = "o", markersize = 4)
+axes[1].axhline(0, linestyle = "--", color = "tab:blue", linewidth = 1)
+axes[1].set_xlabel("Year")
+axes[1].set_ylabel("Residuals")
+axes[1].set_title("B: Transformed model modDish_ar1")
+
+plt.tight_layout()
+plt.show()
 ```
 
 Based on the runs test, there is not enough evidence of autocorrelation in the new residuals:
 
-```{r}
+```{python}
 #| code-fold: false
 
-lawstat::runs.test(rstandard(modDish_ar1))
+std_resid_ar1 = (modDish_ar1.resid - modDish_ar1.resid.mean()) / modDish_ar1.resid.std(ddof = 1)
+z_run, p_run = runstest_1samp(std_resid_ar1, correction = False)
+print(f"Runs test: z = {z_run:.4f}, p-value = {p_run:.4f}")
 ```
 :::
 
@@ -113,18 +135,19 @@ where $\boldsymbol{\Sigma}$ is the covariance matrix.
 The method of weighted least squares (WLS; @sec-wls) is just a special case of the GLS. 
 In the WLS approach, all the off-diagonal entries of $\boldsymbol{\Sigma}$ are 0.
 
-We can use the function `nlme::gls()` and specify the `correlation` structure to avoid iterating the steps from the previous example manually:
+We can use statsmodels' GLS with an AR(1) correlation structure to avoid iterating the steps from the previous example manually:
 
-```{r}
+```{python}
 #| code-fold: false
 
-modDish_ar1_v2 <- nlme::gls(DISH ~ RES
-                            ,correlation = nlme::corAR1(form = ~Year)
-                            ,data = D)
-summary(modDish_ar1_v2)
+# For GLS with AR(1) errors, we use GLSAR (GLS with AutoRegressive errors)
+modDish_ar1_v2 = GLSAR(D["DISH"], sm.add_constant(D["RES"]), rho = 1).iterative_fit(maxiter = 10)
+print(modDish_ar1_v2.summary())
+print(f"\nEstimated rho: {modDish_ar1_v2.model.rho[0]:.4f}")
 ```
 
 ::: {.callout-note}
-In the function `nlme::gls()` we can also specify `weights` to accommodate heteroskedastic errors, but the syntax differs from the `weights` specification in the function `stats::lm()` (@sec-wls). 
-See `?nlme::varFixed`.
+In statsmodels, `GLSAR` (Generalized Least Squares with AutoRegressive errors) performs iterative estimation of both the regression parameters and the autocorrelation coefficient $\rho$. The `rho` argument in the initialization specifies the order (1 for AR(1)), and `iterative_fit()` refines the estimates until convergence.
+
+Alternatively, for more complex correlation structures, you can use `GLS` with a manually specified covariance matrix, or combine regression with ARIMA error modeling using `SARIMAX`.
 :::
